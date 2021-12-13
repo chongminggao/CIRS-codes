@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/pytorch-1.9.0+cu111-%237732a8)](https://pytorch.org/)
 
-This repository contains the official Pytorch implementation for the paper *CIRS: Bursting Filter Bubbles by Counterfactual Interactive Recommender System*. It also contain the two environments in the paper: *VirtualTaobao* (with the leave mechanism altered to penalize filter bubbles) and the proposed *KuaishouEnv*.
+This repository contains the official Pytorch implementation for the paper *CIRS: Bursting Filter Bubbles by Counterfactual Interactive Recommender System*. It also contains the two environments in the paper: *VirtualTaobao* (with the leave mechanism altered to penalize filter bubbles) and the proposed *KuaishouEnv*.
 
 <img src="figs/intro2.png" alt="introduction" style="zoom:100%;" />
 
