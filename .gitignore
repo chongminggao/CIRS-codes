@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+.idea/
+
+environments/KuaishouRec/data/*
+!environments/KuaishouRec/data/.gitkeep
+environments/VirtualTaobao/virtualTB/SupervisedLearning/dataset.txt
+
+saved_models/
+visualization/figures
+visualization/results
+
+*.egg*
+events.*
