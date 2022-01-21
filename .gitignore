@@ -13,5 +13,7 @@ saved_models/
 visualization/figures
 visualization/results
 
+*.zip
+
 *.egg*
 events.*

@@ -109,7 +109,7 @@ The following commands only give one argument `--cuda 0` as an example. For more
 2. Plan the RL policy using trained user model
 
     ```bash
-    python3 CIRS-RL-taobao.py --cuda 0
+    python3 CIRS-RL-taobao.py --cuda 0 --epoch 100 --message "my-CIRS"
     ```
 
 ---
@@ -125,5 +125,5 @@ The following commands only give one argument `--cuda 0` as an example. For more
 2. Plan the RL policy using trained user model
 
     ```bash
-    python3 CIRS-RL-kuaishou.py --cuda 0
+    python3 CIRS-RL-kuaishou.py --cuda 0 --epoch 100 --message "my-CIRS"
     ```
