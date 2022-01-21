@@ -150,10 +150,11 @@ class PPOPolicy(A2CPolicy):
                     - self._weight_ent * ent_loss
 
                 optim_RL.zero_grad()
-                if step == repeat - 1 and b_ind == math.floor(batch.__len__()/batch_size) - 1:
-                    loss.backward()
-                else:
-                    loss.backward(retain_graph=True)
+                loss.backward(retain_graph=True)
+                # if step == repeat - 1 and b_ind == math.floor(batch.__len__()/batch_size) - 1:
+                #     loss.backward()
+                # else:
+                #     loss.backward(retain_graph=True)
 
                 if self._grad_norm:  # clip large gradient
                     nn.utils.clip_grad_norm_(
@@ -161,13 +162,16 @@ class PPOPolicy(A2CPolicy):
                         max_norm=self._grad_norm)
 
                 optim_RL.step()
-                if step == repeat - 1 and b_ind == math.floor(batch.__len__()/batch_size) - 1:
-                    optim_state.step()
+                # if step == repeat - 1 and b_ind == math.floor(batch.__len__()/batch_size) - 1:
+                #     optim_state.step()
 
                 clip_losses.append(clip_loss.item())
                 vf_losses.append(vf_loss.item())
                 ent_losses.append(ent_loss.item())
                 losses.append(loss.item())
+
+        optim_state.step() # Only update at the last one batch.
+
         # update learning rate if lr_scheduler is given
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
