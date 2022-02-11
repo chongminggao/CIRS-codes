@@ -1,6 +1,6 @@
 # Counterfactual Interactive Recommender System (CIRS)
 
-[![LICENSE](https://img.shields.io/badge/license-MIT-green)](https://github.com/yaoyao-liu/mnemonics/blob/master/LICENSE)
+[![LICENSE](https://img.shields.io/badge/license-MIT-green)](https://github.com/chongminggao/CIRS-codes/blob/main/LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/pytorch-1.9.0+cu111-%237732a8)](https://pytorch.org/)
 
