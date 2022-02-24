@@ -127,3 +127,24 @@ The following commands only give one argument `--cuda 0` as an example. For more
     ```bash
     python3 CIRS-RL-kuaishou.py --cuda 0 --epoch 100 --message "my-CIRS"
     ```
+
+---
+## Main Contributors
+
+<table border="0">
+  <tbody>
+    <tr align="center" >
+      <td>
+        ​ <a href="https://github.com/chongminggao"><img width="70" height="70" src="https://github.com/chongminggao.png?s=40" alt="pic"></a><br>
+        ​ <a href="https://github.com/chongminggao">Chongming Gao</a> ​
+        <p>
+        USTC (中科大)  </p>​
+      </td>
+      <td>
+         <a href="https://github.com/Strawberry47"><img width="70" height="70" src="https://github.com/Strawberry47.png?s=40" alt="pic"></a><br>
+         <a href="https://github.com/Strawberry47">Shiqi Wang</a> ​
+        <p>Chongqing University (重庆大学)  </p>​
+      </td>
+    </tr>
+  </tbody>
+</table>
