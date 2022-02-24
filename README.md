@@ -13,7 +13,7 @@ This repository contains the official Pytorch implementation for the paper *CIRS
 
 - #### VirtualTaobao
 
-The details of *VirtualTaobao* can be referred to [this repository](https://github.com/eyounx/VirtualTaobao). Note that we alter the exit mechanism to penalize filter bubbles. Specifically, in the original VirtualTaobao environment the length of interaction trajectory is fixed and predicted in advanced, we changes it so that the interaction will be terminated when the recommended items repeats in a short time. 
+The details of *VirtualTaobao* can be referred to [this repository](https://github.com/eyounx/VirtualTaobao). Note that we alter the exit mechanism to penalize filter bubbles. Specifically, in the original VirtualTaobao environment the length of interaction trajectory is fixed and predicted in advance, we change it so that the interaction will be terminated when the recommended items repeat in a short time. 
 
 **Exiting mechanism**: We compute the Euclidean distance between recommended target and the most recent $N$ recommended items. If any of them is lower than the threshold $d_Q$, the environment will quit the interaction process as the real users can get bored and quit given the tedious recommendation. 
 
