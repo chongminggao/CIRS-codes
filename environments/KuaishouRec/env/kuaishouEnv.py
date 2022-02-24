@@ -154,8 +154,8 @@ class KuaishouEnv(gym.Env):
 
     def __user_generator(self):
         user = random.randint(0, len(self.mat) - 1)
-        # todo for debug
-        user = 0
+        # # todo for debug
+        # user = 0
         return user
 
     def step(self, action):

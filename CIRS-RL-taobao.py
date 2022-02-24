@@ -53,7 +53,7 @@ def get_args():
     parser.add_argument("--env", type=str, default="VirtualTB-v0")
     parser.add_argument("--user_model_name", type=str, default="MLP")
     parser.add_argument("--model_name", type=str, default="CIRS")
-    parser.add_argument('--seed', default=2021, type=int)
+    parser.add_argument('--seed', default=2022, type=int)
     parser.add_argument('--cuda', default=0, type=int)
 
     parser.add_argument('--cpu', dest='cpu', action='store_true')
