@@ -13,7 +13,7 @@ from tensorflow.python.keras.callbacks import Callback
 
 def create_dir(create_dirs):
     """
-    创建所需要的目录
+    Create the required directories.
     """
     for dir in create_dirs:
         if not os.path.exists(dir):
