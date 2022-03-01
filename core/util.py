@@ -94,7 +94,8 @@ def load_static_validate_data_kuaishou(entity_dim, feature_dim, DATAPATH):
 
     df_feat = pd.DataFrame(list_feat, columns=['feat0', 'feat1', 'feat2', 'feat3'], dtype=int)
     df_feat.index.name = "photo_id"
-    df_feat[df_feat.isna()] = 0
+    df_feat[df_feat.isna()] = -1
+    df_feat = df_feat + 1
     df_feat = df_feat.astype(int)
 
     df_small = df_small.join(df_feat, on=['photo_id'], how="left")

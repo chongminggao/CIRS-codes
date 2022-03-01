@@ -92,7 +92,8 @@ class KuaishouEnv(gym.Env):
 
         df_feat = pd.DataFrame(list_feat, columns=['feat0', 'feat1', 'feat2', 'feat3'], dtype=int)
         df_feat.index.name = "photo_id"
-        df_feat[df_feat.isna()] = 0
+        df_feat[df_feat.isna()] = -1
+        df_feat = df_feat + 1
         df_feat = df_feat.astype(int)
 
         photo_mean_duration_path = os.path.join(DATAPATH, "photo_mean_duration.json")
