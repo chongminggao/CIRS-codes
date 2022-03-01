@@ -133,8 +133,11 @@ class UserModel_Pairwise(UserModel):
         X_neg = x[:, 7:]
 
 
-        y_deepfm_pos = self._deepfm(X_pos, self.feature_columns, self.feature_index)
-        y_deepfm_neg = self._deepfm(X_neg, self.feature_columns, self.feature_index)
+        # y_deepfm_pos = self._deepfm(X_pos, self.feature_columns, self.feature_index)
+        # y_deepfm_neg = self._deepfm(X_neg, self.feature_columns, self.feature_index)
+        y_deepfm_pos = self.forward(X_pos)
+        y_deepfm_neg = self.forward(X_neg)
+
 
         if self.ab_columns is None:
             loss = self.loss_func(y, y_deepfm_pos, y_deepfm_neg, score)
