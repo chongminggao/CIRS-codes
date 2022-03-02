@@ -232,9 +232,9 @@ def main(args):
         pickle.dump(normed_mat, f)
 
     #  To cpu
-    user_model = model.cpu()
-    user_model.linear_model.device = "cpu"
-    user_model.linear.device = "cpu"
+    model = model.cpu()
+    model.linear_model.device = "cpu"
+    model.linear.device = "cpu"
     # for linear_model in user_model.linear_model_task:
     #     linear_model.device = "cpu"
 
