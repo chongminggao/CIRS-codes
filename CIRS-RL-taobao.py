@@ -212,10 +212,7 @@ def main(args):
     # net1 = Net(state_shape, hidden_sizes=args.hidden_sizes, device=device)
     # net1 = Net(args.dim_state, hidden_sizes=args.hidden_sizes, device=device)
     net = Net(args.dim_state, hidden_sizes=args.hidden_sizes, device=device)
-    if args.env == "VirtualTB-v0":
-        actor = ActorProb(net, action_shape, max_action=max_action, device=device).to(device)
-    elif args.env == "KuaishouEnv-v0":
-        actor = Actor(net, env.mat.shape[1], device=device).to(device)
+    actor = ActorProb(net, action_shape, max_action=max_action, device=device).to(device)
     critic = Critic(net, device=device).to(device)
     # critic = Critic(Net(state_shape, hidden_sizes=args.hidden_sizes, device=device), device=device).to(device)
 
@@ -233,11 +230,10 @@ def main(args):
 
     # replace DiagGuassian with Independent(Normal) which is equivalent
     # pass *logits to be consistent with policy.forward
-    if args.env == "VirtualTB-v0":
-        def dist(*logits):
-            return Independent(Normal(*logits), 1)
-    elif args.env == "KuaishouEnv-v0":
-        dist = torch.distributions.Categorical
+
+    def dist(*logits):
+        return Independent(Normal(*logits), 1)
+  
 
     policy = PPOPolicy(
         actor, critic, optim, dist,
