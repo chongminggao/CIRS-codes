@@ -173,9 +173,9 @@ def main(args):
         pickle.dump(model_parameters, output_file)
 
     #  To cpu
-    user_model = model.cpu()
-    user_model.linear_model.device = "cpu"
-    for linear_model in user_model.linear_model_task:
+    model = model.cpu()
+    model.linear_model.device = "cpu"
+    for linear_model in model.linear_model_task:
         linear_model.device = "cpu"
 
     model_save_path = os.path.join(MODEL_SAVE_PATH, "{}_{}.pt".format(args.user_model_name, args.message))
