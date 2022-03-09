@@ -57,8 +57,9 @@ class UserModel_Pairwise(UserModel):
         self.task_dnn_units = task_dnn_units
 
 
-
-        # set networks
+        """
+        For DNN Layer.
+        """
 
         self.dnn = DNN(compute_input_dim(self.feature_columns), dnn_hidden_units,
                             activation=dnn_activation, l2_reg=l2_reg_dnn, dropout_rate=dnn_dropout, use_bn=dnn_use_bn,
@@ -68,7 +69,7 @@ class UserModel_Pairwise(UserModel):
 
 
         """
-        For DeepFM Layer.
+        For FM Layer.
         """
         use_fm = True if task_logit_dim == 1 else False
         self.use_fm = use_fm
