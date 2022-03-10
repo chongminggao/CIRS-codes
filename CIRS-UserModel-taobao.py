@@ -136,7 +136,7 @@ def main(args):
     # %% 3. Setup model
     device = torch.device("cuda:{}".format(args.cuda) if torch.cuda.is_available() else "cpu")
 
-    SEED = 2021
+    SEED = 2022
     # tasks = "regression"
     # task_loss = collections.OrderedDict({feat.name: "mse" for feat in y_columns})
     # model = UserModel_DeepFM(x_columns, y_columns, tasks,
