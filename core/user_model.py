@@ -286,43 +286,43 @@ class UserModel(nn.Module):
 
     def recommend_k_item(self, user, dataset_val, k=1, is_softmax=True, epsilon=0, is_ucb=False):  # for kuaishou data
 
-        df_photo_env = dataset_val.df_photo_env 
+        df_photo_env = dataset_val.df_photo_env # 小数据集的feature
         item_index = df_photo_env.index.to_numpy()
-        # all ratings of user
+        # 用户的所有评分
         u_all_item = torch.tensor(
             np.concatenate((np.ones([len(df_photo_env), 1]) * user,
                             np.expand_dims(item_index, axis=-1),
                             df_photo_env.values), 1),
             dtype=torch.float, device=self.device, requires_grad=False)
 
-        u_rating = self.forward(u_all_item).detach().squeeze() # predicted value
+        u_value = self.forward(u_all_item).detach().squeeze() # predicted value
 
         if is_ucb:
             if not hasattr(self, "n_rec"):
-                self.compile_UCB(len(u_rating))
+                self.compile_UCB(len(u_value))
 
             # with warnings.catch_warnings():
             #     warnings.simplefilter("ignore")
             ucb_bound = (2 * np.log(self.n_rec) / self.n_each) ** 0.5
 
             # ucb_bound[np.isnan(ucb_bound)] = 0
-            # ucb_bound[np.isinf(ucb_bound)] = u_rating.max()
+            # ucb_bound[np.isinf(ucb_bound)] = u_value.max()
 
-            u_rating_ucb = u_rating + torch.Tensor(ucb_bound).to(u_rating.device)
+            u_value_ucb = u_value + torch.Tensor(ucb_bound).to(u_value.device)
         else:
-            u_rating_ucb = u_rating
+            u_value_ucb = u_value
 
 
         if is_softmax:
-            rating = self.softmax(u_rating_ucb)
-            index = torch.multinomial(rating, k, replacement=False)
+            value = self.softmax(u_value_ucb)
+            index = torch.multinomial(value, k, replacement=False)
         else:
-            # rating = u_rating
-            # if min(rating) < 0:
-            #     rating = -min(rating) + rating
-            #     rating = rating / sum(rating)
+            # value = u_value
+            # if min(value) < 0:
+            #     value = -min(value) + value
+            #     value = value / sum(value)
             # Todo:
-            index = u_rating_ucb.argmax() # 预测分数的max
+            index = u_value_ucb.argmax() # 预测分数的max
 
         if epsilon > 0 and np.random.random() < epsilon:
             # # epsilon-greedy activated!!
@@ -335,9 +335,9 @@ class UserModel(nn.Module):
         # print(int(index), end=' ')
 
         recommendation = item_index[index]
-        rating_rec = u_rating.cpu().numpy()[index]
+        value_rec = u_value.cpu().numpy()[index]
 
-        return recommendation, rating_rec
+        return recommendation, value_rec
 
     def evaluate_data(self, dataset_val, batch_size=256):
 
