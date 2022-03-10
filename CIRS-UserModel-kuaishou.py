@@ -192,7 +192,7 @@ def main(args):
     # %% 4. Setup model
     device = torch.device("cuda:{}".format(args.cuda) if torch.cuda.is_available() else "cpu")
 
-    SEED = 2021
+    SEED = 2022
     task = "regression"
     task_logit_dim = 1
     model = UserModel_Pairwise(x_columns, y_columns, task, task_logit_dim,
