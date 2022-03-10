@@ -106,7 +106,7 @@ class KuaishouEnv(gym.Env):
         df_photo_env['photo_duration'] = np.array(
             list(map(lambda x: photo_mean_duration[x], df_photo_env.index)))
 
-        # load or construct the similarity mat (between item pairs):
+        # load or construct the distance mat (between item pairs):
         df_dist_small = get_distance_mat(list_feat, lbe_photo.classes_, DATAPATH=DATAPATH)
 
         return mat, lbe_user, lbe_photo, list_feat, df_photo_env, df_dist_small
