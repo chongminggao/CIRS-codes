@@ -126,7 +126,7 @@ def load_static_validate_data_kuaishou(entity_dim, feature_dim, DATAPATH):
         photo_mean_duration = json.load(file)
     photo_mean_duration = {int(k): v for k, v in photo_mean_duration.items()}
 
-    dataset_val = StaticDataset(x_columns, y_columns, user_features, item_features, num_workers=4)
+    dataset_val = StaticDataset(x_columns, y_columns, num_workers=4)
     dataset_val.compile_dataset(df_x, df_y)
     dataset_val.set_env_items(df_small, df_feat, photo_mean_duration)
 
