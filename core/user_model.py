@@ -33,7 +33,7 @@ from deepctr_torch.callbacks import History
 
 
 class StaticDataset(Dataset):
-    def __init__(self, x_columns, y_columns, user_features=None, item_features=None, num_workers=4):
+    def __init__(self, x_columns, y_columns, num_workers=4):
         self.x_columns = x_columns
         self.y_columns = y_columns
 
