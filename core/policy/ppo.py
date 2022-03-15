@@ -108,10 +108,9 @@ class PPOPolicy(A2CPolicy):
         optim_RL, optim_state = self.optim
 
         for step in range(repeat):
-
-            if step == repeat - 1:
-                optim_state.zero_grad()
-
+            optim_state.zero_grad()
+#             if step == repeat - 1:
+#                 optim_state.zero_grad()
             if self._recompute_adv and step > 0:
                 batch = self._compute_returns(batch, self._buffer, self._indice)
 
