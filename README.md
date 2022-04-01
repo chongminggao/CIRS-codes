@@ -27,10 +27,6 @@ It contains two matrices: *big matrix* and *small matrix*, where the latter is a
 
 <img src="figs/KuaiRec.png" alt="KuaishouEnv" style="zoom: 60%;" />
 
-|                | #Users | #Items | #Attributes | Density |
-| -------------- | :----: | :----: | :---------: | :-----: |
-| *small matrix* | 1,411  | 3,327  |     31      |  100%   |
-| *big matrix*   | 7,176  | 10,729 |     31      | 12.77%  |
 
 **Exiting mechanism**: For the most recent $N$ recommended items, if more than the threshold $n_Q$ items have at least one attribute of the current recommended target, then the environment ends the interaction process.
 
