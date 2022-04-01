@@ -23,9 +23,9 @@ The details of *VirtualTaobao* can be referred to [this repository](https://gith
 
 *KuaishouEnv* is created by us in this project to evaluate interactive recommenders in video recommendation on Kuaishou, a video-sharing mobile App. Unlike VirtualTaobao that simulates real users by training a model on Taobao data, we use real user historical feedback in our environment. 
 
-It contains two matrices: *big matrix* and *small matrix*, where the latter is a fully filled user-item matrix. The statistics are shown in the following table. The details of data collection can be referred to our paper. 
+It contains two matrices: *big matrix* and *small matrix*, where the latter is a fully filled user-item matrix. The statistics are shown in the following table. The details of data collection can be referred to the KuaiRec dataset ([Webpage](https://chongminggao.github.io/KuaiRec/), [Paper](https://arxiv.org/pdf/2202.10842.pdf)). 
 
-<img src="figs/KuaishouEnv.png" alt="KuaishouEnv" style="zoom: 60%;" />
+<img src="figs/KuaiRec.png" alt="KuaishouEnv" style="zoom: 60%;" />
 
 |                | #Users | #Items | #Attributes | Density |
 | -------------- | :----: | :----: | :---------: | :-----: |
