@@ -15,27 +15,27 @@ This repository contains the official Pytorch implementation for the paper *CIRS
 
 The details of *VirtualTaobao* can be referred to [this repository](https://github.com/eyounx/VirtualTaobao). Note that we alter the exit mechanism to penalize filter bubbles. Specifically, in the original VirtualTaobao environment the length of interaction trajectory is fixed and predicted in advance, we change it so that the interaction will be terminated when the recommended items repeat in a short time. 
 
-**Exiting mechanism**: We compute the Euclidean distance between recommended target and the most recent $N$ recommended items. If any of them is lower than the threshold $d_Q$, the environment will quit the interaction process as the real users can get bored and quit given the tedious recommendation. 
+**Exiting mechanism**: We compute the Euclidean distance between the recommended target and the most recent $N$ recommended items. If any of them is lower than the threshold $d_Q$, the environment will quit the interaction process as the real users can get bored and quit given the tedious recommendation. 
 
 
 
 - #### KuaishouEnv
 
-*KuaishouEnv* is created by us in this project to evaluate interactive recommenders in video recommendation on Kuaishou, a video-sharing mobile App. Unlike VirtualTaobao that simulates real users by training a model on Taobao data, we use real user historical feedback in our environment. 
+*KuaishouEnv* is created by us in this project to evaluate interactive recommenders in video recommendation on Kuaishou, a video-sharing mobile App. Unlike VirtualTaobao which simulates real users by training a model on Taobao data, we use real user historical feedback in our environment. 
 
 It contains two matrices: *big matrix* and *small matrix*, where the latter is a fully filled user-item matrix. The statistics are shown in the following table. The details of data collection can be referred to the KuaiRec dataset ([Webpage](https://chongminggao.github.io/KuaiRec/), [Paper](https://arxiv.org/pdf/2202.10842.pdf)). 
 
 <img src="figs/KuaiRec.png" alt="KuaishouEnv" style="zoom: 60%;" />
 
 
-**Exiting mechanism**: For the most recent $N$ recommended items, if more than the threshold $n_Q$ items have at least one attribute of the current recommended target, then the environment ends the interaction process.
+**Exiting mechanism**: For the most recent $N$ recommended items, if more than the threshold $n_Q$ items have at least one attribute of the currently recommended target, then the environment ends the interaction process.
 
 <img src="figs/exit.png" alt="exit" style="zoom:67%;" />
 
 ---
 ## Installation
 
-1. Clone this git repository and change directory to this repostory:
+1. Clone this git repository and change directory to this repository:
 
 	```bash
 	git clone git@github.com:chongminggao/CIRS-codes.git
@@ -62,7 +62,7 @@ It contains two matrices: *big matrix* and *small matrix*, where the latter is a
     sh install.sh
     ```
 
-Note that the implementation requires two platforms, [DeepCTR-Torch](https://github.com/shenweichen/DeepCTR-Torch) and [Tianshou](https://github.com/thu-ml/tianshou). The codes of the two platforms have been already included in this repository and are altered here and there. 
+Note that the implementation requires two platforms, [DeepCTR-Torch](https://github.com/shenweichen/DeepCTR-Torch) and [Tianshou](https://github.com/thu-ml/tianshou). The codes of the two platforms have already been included in this repository and are altered here and there. 
 
 ## Download the data
 
@@ -72,7 +72,7 @@ Note that the implementation requires two platforms, [DeepCTR-Torch](https://git
     wget https://linux.chongminggao.top/CIRS/environment%20data.zip
     ```
 
-(Download options: If the download via `wget` is too slow, you can mannually download the file to root path of this repository)
+(Download options: If the download via `wget` is too slow, you can manually download the file to the root path of this repository)
 
 - Optional link 1: [Google drive](https://drive.google.com/file/d/1v9y-nxhrtOg_Kd3sm6hJ4curNFpgRbPx/view). 
 
@@ -102,7 +102,7 @@ The following commands only give one argument `--cuda 0` as an example. For more
     python3 CIRS-UserModel-taobao.py --cuda 0
     ```
 
-2. Plan the RL policy using trained user model
+2. Plan the RL policy using a trained user model
 
     ```bash
     python3 CIRS-RL-taobao.py --cuda 0 --epoch 100 --message "my-CIRS"
