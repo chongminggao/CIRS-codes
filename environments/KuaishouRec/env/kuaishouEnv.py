@@ -87,7 +87,6 @@ class KuaishouEnv(gym.Env):
         print("number of items:", len(data_feat))
         list_feat = [0] * len(data_feat)
         for i in range(len(data_feat)):
-            # list_feat[i] = set(data_feat[str(i)]['feature_index'])
             list_feat[i] = data_feat[str(i)]['feature_index']
 
         df_feat = pd.DataFrame(list_feat, columns=['feat0', 'feat1', 'feat2', 'feat3'], dtype=int)
