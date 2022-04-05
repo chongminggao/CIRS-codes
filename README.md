@@ -8,7 +8,7 @@ This repository contains the official Pytorch implementation for the paper *CIRS
 
 <img src="figs/intro2.png" alt="introduction" style="zoom:100%;" />
 
-More descriptions are available via the [paper](#) and this [slides](https://cdn.chongminggao.top/files/pdf/CIRS-slides.pdf).
+More descriptions are available via the [paper](https://arxiv.org/pdf/2204.01266.pdf) and this [slides](https://cdn.chongminggao.top/files/pdf/CIRS-slides.pdf).
 
 ---
 ## Two environments for evaluating filter bubbles in interactive recommendation.
