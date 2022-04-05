@@ -10,6 +10,24 @@ This repository contains the official Pytorch implementation for the paper *CIRS
 
 More descriptions are available via the [paper](https://arxiv.org/pdf/2204.01266.pdf) and this [slides](https://cdn.chongminggao.top/files/pdf/CIRS-slides.pdf).
 
+If this work helps you, please kindly cite our papers:
+
+```latex
+@article{gao2022cirs,
+  title = {CIRS: Bursting Filter Bubbles by Counterfactual Interactive Recommender System},
+  author = {Gao, Chongming and Lei, Wenqiang and Chen, Jiawei and Wang, Shiqi and He, Xiangnan and Li, Shijun and Li, Biao and Zhang, Yuan and Jiang, Peng},
+  journal={arXiv preprint arXiv:2204.01266},
+  year={2022}
+}
+
+@article{gao2022kuairec,
+  title={KuaiRec: A Fully-observed Dataset for Recommender Systems},
+  author={Gao, Chongming and Li, Shijun and Lei, Wenqiang and Li, Biao and Jiang, Peng and Chen, Jiawei and He, Xiangnan and Mao, Jiaxin and Chua, Tat-Seng},
+  journal={arXiv preprint arXiv:2202.10842},
+  year={2022}
+}
+```
+
 ---
 ## Two environments for evaluating filter bubbles in interactive recommendation.
 
