@@ -563,6 +563,10 @@ def create_embedding_matrix(feature_columns, init_std=0.0001, linear=False, spar
     )
 
     for tensor in embedding_dict.values():
-        nn.init.normal_(tensor.weight, mean=0, std=init_std)
+        if tensor.padding_idx is None:
+            nn.init.normal_(tensor.weight, mean=0, std=init_std)
+        else:
+            nn.init.normal_(tensor.weight[:tensor.padding_idx], mean=0, std=init_std)
+            nn.init.normal_(tensor.weight[tensor.padding_idx + 1:], mean=0, std=init_std)
 
     return embedding_dict.to(device)

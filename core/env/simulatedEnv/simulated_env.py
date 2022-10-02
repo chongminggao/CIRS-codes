@@ -132,8 +132,9 @@ class SimulatedEnv(gym.Env):
         self.total_turn = self.env_task.total_turn
 
         done = real_done
-        if done:
-            self.state = self.env_task.reset()
+        # Rethink commented, do not use new user as new state
+        # if done:
+        #     self.state = self.env_task.reset()
 
         self.state = self._construct_state(pred_reward)
 

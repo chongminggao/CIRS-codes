@@ -217,7 +217,7 @@ def main(args):
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     train_envs.seed(args.seed)
-    test_envs.seed(args.seed)
+    # test_envs.seed(args.seed)
 
     # %% 4. Setup model
 
