@@ -37,7 +37,7 @@ def get_args():
     parser.add_argument("--user_model_name", type=str, default="MLP")
     parser.add_argument('--dnn', default=(64, 64), type=int, nargs="+")
     parser.add_argument('--batch_size', default=100, type=int)
-    parser.add_argument('--epoch', default=3, type=int)
+    parser.add_argument('--epoch', default=10, type=int)
     parser.add_argument('--cuda', default=0, type=int)
     # # env:
     # parser.add_argument('--leave_threshold', default=4.0, type=float)

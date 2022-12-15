@@ -26,7 +26,7 @@ import logzero
 from logzero import logger
 
 from evaluation import test_taobao
-# from util.upload import my_upload
+from util.upload import my_upload
 from util.utils import create_dir, LoggerCallback_Update
 
 
@@ -35,18 +35,22 @@ def get_args():
     parser.add_argument('--resume', action="store_true")
     parser.add_argument("--env", type=str, default="VirtualTB-v0")
     parser.add_argument("--feature_dim", type=int, default=4)
-    parser.add_argument("--model_name", type=str, default="MLP")
+    parser.add_argument("--model_name", type=str, default="MLP-RL-epsilon")
     parser.add_argument('--dnn', default=(256, 256), type=int, nargs="+")
     parser.add_argument('--batch_size', default=100, type=int)
     parser.add_argument('--epoch', default=100, type=int)
-    parser.add_argument('--cuda', default=0, type=int)
+    parser.add_argument('--cuda', default=1, type=int)
+
+    parser.add_argument('--epsilon', default=0, type=float)
+
 
     # env special:
     parser.add_argument('--leave_threshold', default=1.0, type=float)
     parser.add_argument('--num_leave_compute', default=5, type=int)
-    parser.add_argument('--max_turn', default=5, type=int)
+    parser.add_argument('--max_turn', default=50, type=int)
 
-    parser.add_argument("--message", type=str, default="MLP")
+
+    parser.add_argument("--message", type=str, default="MLP-epsilonGreedy")
     # parser.add_argument('--dim', default=20, type=int)
 
     args = parser.parse_known_args()[0]
@@ -110,7 +114,7 @@ def main(args):
     # %% 4. Setup model
     device = torch.device("cuda:{}".format(args.cuda) if torch.cuda.is_available() else "cpu")
 
-    SEED = 2022
+    SEED = 2021
 
     # tasks = "regression"
     # task_loss = collections.OrderedDict({feat.name: "mse" for feat in y_columns})
@@ -132,7 +136,7 @@ def main(args):
                   loss_func=loss_taobao,
                   metrics=None)  # No evaluation step at offline stage
 
-    model.compile_RL_test(functools.partial(test_taobao, env=env))
+    model.compile_RL_test(functools.partial(test_taobao, env=env, epsilon=args.epsilon))
 
     # %% 5. Learn model
     history = model.fit_data(static_dataset,
@@ -144,7 +148,7 @@ def main(args):
     LOCAL_PATH = logger_path
     REMOTE_PATH = os.path.join(REMOTE_ROOT, os.path.dirname(LOCAL_PATH))
 
-    # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
+    my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
 
 
 
