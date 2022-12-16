@@ -13,6 +13,7 @@ import json
 import os
 import pickle
 import time
+import traceback
 
 import gym
 import torch
@@ -34,7 +35,7 @@ from logzero import logger
 
 from environments.KuaishouRec.env.kuaishouEnv import KuaishouEnv
 from evaluation import test_kuaishou
-from util.upload import my_upload
+# from util.upload import my_upload
 from util.utils import create_dir, LoggerCallback_Update
 
 DATAPATH = "environments/KuaishouRec/data"
@@ -232,7 +233,7 @@ def main(args):
     LOCAL_PATH = logger_path
     REMOTE_PATH = os.path.join(REMOTE_ROOT, os.path.dirname(LOCAL_PATH))
 
-    my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
+    # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
 
 
 
@@ -249,4 +250,9 @@ def loss_kuaishou_IPS_pairwise(y, y_deepfm_pos, y_deepfm_neg, IPS_score):
 
 if __name__ == '__main__':
     args = get_args()
-    main(args)
+    try:
+        main(args)
+    except Exception as e:
+        var = traceback.format_exc()
+        print(var)
+        logzero.logger.error(var)

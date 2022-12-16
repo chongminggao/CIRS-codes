@@ -35,7 +35,7 @@ from logzero import logger
 
 from environments.KuaishouRec.env.kuaishouEnv import KuaishouEnv
 from evaluation import test_kuaishou
-from util.upload import my_upload
+# from util.upload import my_upload
 from util.utils import create_dir, LoggerCallback_Update
 
 DATAPATH = "environments/KuaishouRec/data"
@@ -230,7 +230,7 @@ def load_static_validate_data_kuaishou(entity_dim, feature_dim):
         photo_mean_duration = json.load(file)
     photo_mean_duration = {int(k): v for k, v in photo_mean_duration.items()}
 
-    dataset_val = StaticDataset(x_columns, y_columns, user_features, item_features, num_workers=4)
+    dataset_val = StaticDataset(x_columns, y_columns, num_workers=4)
     dataset_val.compile_dataset(df_x, df_y)
     dataset_val.set_env_items(df_small, df_feat, photo_mean_duration)
 
@@ -315,7 +315,7 @@ def main(args):
     LOCAL_PATH = logger_path
     REMOTE_PATH = os.path.join(REMOTE_ROOT, os.path.dirname(LOCAL_PATH))
 
-    my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
+    # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
 
 
 

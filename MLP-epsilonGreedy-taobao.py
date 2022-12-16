@@ -11,6 +11,7 @@ import functools
 import json
 import os
 import time
+import traceback
 
 import gym
 from gym.envs.registration import register
@@ -26,7 +27,7 @@ import logzero
 from logzero import logger
 
 from evaluation import test_taobao
-from util.upload import my_upload
+# from util.upload import my_upload
 from util.utils import create_dir, LoggerCallback_Update
 
 
@@ -74,7 +75,7 @@ def load_dataset_virtualTaobao(feature_dim=10):
 
     y_columns = [DenseFeat("feat_item", 27)] + [DenseFeat("y", 1)]
 
-    dataset = StaticDataset(x_columns, y_columns, user_features, item_features, num_workers=4)
+    dataset = StaticDataset(x_columns, y_columns, num_workers=4)
     dataset.compile_dataset(df_x, df_y)
 
     return dataset, x_columns, y_columns
@@ -148,7 +149,7 @@ def main(args):
     LOCAL_PATH = logger_path
     REMOTE_PATH = os.path.join(REMOTE_ROOT, os.path.dirname(LOCAL_PATH))
 
-    my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
+    # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
 
 
 
@@ -177,4 +178,9 @@ def loss_taobao(y_predict, y_true, exposure, y_index):
 
 if __name__ == '__main__':
     args = get_args()
-    main(args)
+    try:
+        main(args)
+    except Exception as e:
+        var = traceback.format_exc()
+        print(var)
+        logzero.logger.error(var)

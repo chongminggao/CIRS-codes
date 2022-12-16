@@ -12,6 +12,7 @@ import json
 import os
 import pickle
 import time
+import traceback
 
 from gym import register
 import gym
@@ -67,8 +68,8 @@ def get_args():
     parser.add_argument('--epoch', default=3, type=int)
     parser.add_argument('--cuda', default=1, type=int)
     # # env:
-    parser.add_argument('--leave_threshold', default=1, type=float)
-    parser.add_argument('--num_leave_compute', default=5, type=int)
+    parser.add_argument('--leave_threshold', default=0, type=float)
+    parser.add_argument('--num_leave_compute', default=1, type=int)
     # exposure parameters:
     parser.add_argument('--tau', default=1000, type=float)
 
@@ -272,4 +273,9 @@ def loss_kuaishou_pairwise(y, y_deepfm_pos, y_deepfm_neg, exposure,  alpha_u=Non
 
 if __name__ == '__main__':
     args = get_args()
-    main(args)
+    try:
+        main(args)
+    except Exception as e:
+        var = traceback.format_exc()
+        print(var)
+        logzero.logger.error(var)

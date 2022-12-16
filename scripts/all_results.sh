@@ -19,18 +19,18 @@ python CIRS-UserModel-taobao.py    --cuda 0 --epoch 10 --tau 0 --message "taobao
 
 
 # KuaiEnv, Length == 50
-python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --is_softmax --message "DeepFM+Softmax" &
+#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --is_softmax --message "DeepFM+Softmax" &
 python DICE.py                    --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "DICE"  &
-python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 0.9 --not_softmax --message "K_epsilon-greedy" &
+#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 0.9 --not_softmax --message "K_epsilon-greedy" &
 python DeepFM-IPS-pairwise.py     --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "IPS"   &
 python PD-pairwise.py             --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "PD"    &
-python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 1.0 --not_softmax --message "K_Random" &
-python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --not_softmax --is_ucb --message "UCB" &
+#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 1.0 --not_softmax --message "K_Random" &
+#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --not_softmax --is_ucb --message "UCB" &
 
 
 # KuaiEnv, Length == 30
-python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 1000 --is_ab --epoch 10 --message "Pair11" & # UM CIRS
-python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau    0 --no_ab --epoch 10 --message "Pair1" & # UM CIRS-wo-CI
+#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 1000 --is_ab --epoch 10 --message "Pair11" & # UM CIRS
+#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau    0 --no_ab --epoch 10 --message "Pair1" & # UM CIRS-wo-CI
 
 
 ## %% Policy Model
@@ -45,13 +45,13 @@ python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compu
 #
 #
 ## KuaiEnv, Length == 30
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 4 --tau 10    --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRS_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 4 --tau 0     --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCI_len30" &
+#python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 10    --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRS_len30" &
+#python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 0     --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCI_len30" &
 #
 #
 ## KuaiEnv, Length == 50
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 4 --tau 100  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRS_len50" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 4 --tau 0      --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCI_len50" & # lds7
+#python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 100  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRS_len50" &
+#python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 0      --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCI_len50" & # lds7
 
 
 

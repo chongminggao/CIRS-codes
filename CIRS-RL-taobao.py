@@ -8,6 +8,7 @@ import json
 import os
 import pickle
 import time
+import traceback
 
 import gym
 import torch
@@ -346,4 +347,9 @@ def save_model_fn(epoch, policy, model_save_path, optim, state_tracker, is_save=
 
 if __name__ == '__main__':
     args = get_args()
-    main(args)
+    try:
+        main(args)
+    except Exception as e:
+        var = traceback.format_exc()
+        print(var)
+        logzero.logger.error(var)

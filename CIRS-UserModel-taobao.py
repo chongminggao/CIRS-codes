@@ -11,6 +11,7 @@ import json
 import os
 import pickle
 import time
+import traceback
 
 import torch
 import tqdm
@@ -109,7 +110,7 @@ def load_dataset_virtualTaobao(tau, feature_dim=10):
 
     exposure_all = compute_exposure_effect_virtualTaobao(df_x, tau)
 
-    dataset = StaticDataset(x_columns, y_columns, user_features, item_features, num_workers=4)
+    dataset = StaticDataset(x_columns, y_columns, num_workers=4)
     dataset.compile_dataset(df_x, df_y, exposure_all)
 
     return dataset, x_columns, y_columns
@@ -201,4 +202,9 @@ def loss_taobao(y_predict, y_true, exposure, y_index):
 
 if __name__ == '__main__':
     args = get_args()
-    main(args)
+    try:
+        main(args)
+    except Exception as e:
+        var = traceback.format_exc()
+        print(var)
+        logzero.logger.error(var)
