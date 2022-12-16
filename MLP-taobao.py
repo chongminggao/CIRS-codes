@@ -44,7 +44,7 @@ def get_args():
     # env special:
     parser.add_argument('--leave_threshold', default=1.0, type=float)
     parser.add_argument('--num_leave_compute', default=5, type=int)
-    parser.add_argument('--max_turn', default=5, type=int)
+    parser.add_argument('--max_turn', default=50, type=int)
 
     parser.add_argument("--message", type=str, default="MLP")
     # parser.add_argument('--dim', default=20, type=int)
