@@ -235,7 +235,7 @@ def main(args):
                                             has_action_embedding=has_action_embedding,
                                             has_feedback_embedding=has_feedback_embedding,
                                             nhead=args.nhead, d_hid=128, nlayers=2, dropout=0.1,
-                                            device=device, seed=args.seed, MAX_TURN=args.max_turn+1).to(device)
+                                            device=device, seed=args.seed, MAX_TURN=args.max_turn).to(device)
 
     net = Net(args.dim_state, hidden_sizes=args.hidden_sizes, device=device)
     actor = Actor(net, env.mat.shape[1], device=device).to(device)

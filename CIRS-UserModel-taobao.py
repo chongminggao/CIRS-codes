@@ -7,15 +7,18 @@
 import argparse
 import collections
 import datetime
+import functools
 import json
 import os
 import pickle
 import time
 import traceback
 
+import gym
 import torch
 import tqdm
 
+from gym.envs.registration import register
 from core.util import compute_action_distance, compute_exposure
 from deepctr_torch.inputs import DenseFeat
 import pandas as pd
@@ -27,6 +30,7 @@ from core.user_model_mmoe import UserModel_MMOE
 import logzero
 from logzero import logger
 
+from evaluation import test_taobao
 from util.utils import create_dir, LoggerCallback_Update
 
 
@@ -41,8 +45,8 @@ def get_args():
     parser.add_argument('--epoch', default=10, type=int)
     parser.add_argument('--cuda', default=0, type=int)
     # # env:
-    # parser.add_argument('--leave_threshold', default=4.0, type=float)
-    # parser.add_argument('--num_leave_compute', default=5, type=int)
+    parser.add_argument('--leave_threshold', default=4.0, type=float)
+    parser.add_argument('--num_leave_compute', default=5, type=int)
     # exposure parameters:
     parser.add_argument('--tau', default=0.01, type=float)
 
