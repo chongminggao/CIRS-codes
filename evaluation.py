@@ -13,16 +13,19 @@ def test_kuaishou(model, env, dataset_val, is_softmax=True, epsilon=0, is_ucb=Fa
     total_turns = 0
     num_trajectory = 100
 
+    all_acts = []
     for i in range(num_trajectory):
         user = env.reset()
         real_user_id = env.lbe_user.inverse_transform(user)
 
+        acts = []
         done = False
         while not done:
             recommendation, reward_pred = model.recommend_k_item(real_user_id[0], dataset_val, k=1, is_softmax=is_softmax, epsilon=epsilon, is_ucb=is_ucb)
 
             # if need_transform:
             rec_small = env.lbe_photo.transform([recommendation])[0]
+            acts.append(rec_small)
 
             state, reward, done, info = env.step(rec_small)
 
@@ -37,13 +40,24 @@ def test_kuaishou(model, env, dataset_val, is_softmax=True, epsilon=0, is_ucb=Fa
 
             if done:
                 break
+        all_acts.extend(acts)
 
     ctr = cumulative_reward / total_turns
     click_loss = total_click_loss / total_turns
 
+    hit_item = len(set(all_acts))
+    num_items = len(dataset_val.df_photo_env)
+    CV = hit_item / num_items
+    CV_turn = hit_item / len(all_acts)
+
     # print('CTR: %.2f'.format(ctr))
-    eval_result_RL = {"CTR": ctr, "click_loss": click_loss, "trajectory_len": total_turns / num_trajectory,
-                      "trajectory_reward": cumulative_reward / num_trajectory}
+    eval_result_RL = {"CTR": ctr,
+                      "click_loss": click_loss,
+                      "trajectory_len": total_turns / num_trajectory,
+                      "trajectory_reward": cumulative_reward / num_trajectory,
+                      "CV":CV,
+                      "CV_turn":CV_turn
+                      }
     # if is_ucb:
     #     eval_result_RL.update({"ucb_n": model.n_each})
 

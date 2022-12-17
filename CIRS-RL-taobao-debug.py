@@ -16,6 +16,7 @@ import argparse
 import numpy as np
 
 from core.inputs import get_dataset_columns
+from core.user_model_mmoe import UserModel_MMOE
 
 from tensorflow.python.keras.callbacks import Callback
 from tensorflow.python.keras.callbacks import History
@@ -28,37 +29,33 @@ from core.collector import Collector
 from core.state_tracker import StateTrackerTransformer
 from core.user_model import compute_input_dim
 from core.policy.ppo import PPOPolicy
-from core.user_model_pairwise import UserModel_Pairwise
-from environments.KuaishouRec.env.kuaishouEnv import KuaishouEnv
 from tianshou.utils import BasicLogger
 from tianshou.env import DummyVectorEnv
 from tianshou.utils.net.common import Net
 # from tianshou.trainer import onpolicy_trainer
 from core.trainer.onpolicy import onpolicy_trainer
 from tianshou.data import VectorReplayBuffer
-from tianshou.utils.net.continuous import ActorProb
-from tianshou.utils.net.discrete import Actor, Critic
+from tianshou.utils.net.continuous import ActorProb, Critic, Actor
+# from tianshou.utils.net.discrete import Actor, Critic
 
 import logzero
 from logzero import logger
 
+from gym.envs.registration import register
+
 # from util.upload import my_upload
 from util.utils import create_dir, LoggerCallback_RL
-
-from gym.envs.registration import register
 
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--env", type=str, default="KuaishouEnv-v0")
-    parser.add_argument("--user_model_name", type=str, default="DeepFM")
+    # parser.add_argument('--resume', action="store_true")
+    # parser.add_argument("--user_env", type=str, default="SimulatedEnv-v0")
+    parser.add_argument("--env", type=str, default="VirtualTB-v0")
+    parser.add_argument("--user_model_name", type=str, default="MLP")
     parser.add_argument("--model_name", type=str, default="CIRS")
     parser.add_argument('--seed', default=2022, type=int)
-    parser.add_argument('--cuda', default=3, type=int)
-
-    parser.add_argument('--is_ab', dest='is_ab', action='store_true')
-    parser.add_argument('--no_ab', dest='is_ab', action='store_false')
-    parser.set_defaults(is_ab=False)
+    parser.add_argument('--cuda', default=0, type=int)
 
     parser.add_argument('--cpu', dest='cpu', action='store_true')
     parser.set_defaults(cpu=False)
@@ -67,37 +64,38 @@ def get_args():
     parser.add_argument('--no_save', dest='is_save', action='store_false')
     parser.set_defaults(is_save=False)
 
-
     # Env
     parser.add_argument("--version", type=str, default="v1")
-    parser.add_argument('--tau', default=0, type=float)
+    parser.add_argument('--tau', default=0.1, type=float)
     parser.add_argument('--gamma_exposure', default=10, type=float)
 
-    parser.add_argument('--leave_threshold', default=0, type=int)
-    parser.add_argument('--num_leave_compute', default=1, type=int)
-    parser.add_argument('--max_turn', default=3, type=int)
+    parser.add_argument('--leave_threshold', default=1, type=float)
+    parser.add_argument('--num_leave_compute', default=5, type=int)
+    parser.add_argument('--max_turn', default=50, type=int)
 
     # state_tracker
     parser.add_argument('--dim_state', default=20, type=int)
-    parser.add_argument('--dim_model', default=32, type=int)
-    parser.add_argument('--nhead', default=4, type=int)
-    # parser.add_argument('--max_len', default=100, type=int)
+    parser.add_argument('--dim_model', default=27, type=int)
+    parser.add_argument('--nhead', default=3, type=int)
+    # parser.add_argument('--max_len', default=50, type=int)
 
     # tianshou
     parser.add_argument('--buffer-size', type=int, default=11000)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--gamma', type=float, default=0.95)
+
     parser.add_argument('--epoch', type=int, default=50)
+
     parser.add_argument('--step-per-epoch', type=int, default=15000)
     parser.add_argument('--repeat-per-collect', type=int, default=2)
-    parser.add_argument('--batch-size', type=int, default=1024)
+    parser.add_argument('--batch-size', type=int, default=2048)
     parser.add_argument('--hidden-sizes', type=int, nargs='*', default=[64, 64])
 
     parser.add_argument('--episode-per-collect', type=int, default=100)
     parser.add_argument('--training-num', type=int, default=100)
 
     parser.add_argument('--test-num', type=int, default=100)
-    parser.add_argument('--render', type=float, default=0)
+    parser.add_argument('--render', type=float, default=0.)
 
     # ppo
     parser.add_argument('--vf-coef', type=float, default=0.25)
@@ -113,7 +111,7 @@ def get_args():
     parser.add_argument('--resume', action="store_true")
     parser.add_argument("--save-interval", type=int, default=1000)
 
-    parser.add_argument("--read_message", type=str, default="Pair1")
+    parser.add_argument("--read_message", type=str, default="taobao tau 1")
     parser.add_argument("--message", type=str, default="debug")
 
     args = parser.parse_known_args()[0]
@@ -143,54 +141,30 @@ def main(args):
     # %% 2. prepare user model
 
     USERMODEL_Path = os.path.join(".", "saved_models", args.env, args.user_model_name)
-    model_parameter_path = os.path.join(USERMODEL_Path,
-                                        "{}_params_{}.pickle".format(args.user_model_name, args.read_message))
+    model_parameter_path = os.path.join(USERMODEL_Path, "{}_params_{}.pickle".format(args.user_model_name, args.read_message))
     model_save_path = os.path.join(USERMODEL_Path, "{}_{}.pt".format(args.user_model_name, args.read_message))
 
     with open(model_parameter_path, "rb") as file:
         model_params = pickle.load(file)
 
     model_params["device"] = "cpu"
-    user_model = UserModel_Pairwise(**model_params)
+    user_model = UserModel_MMOE(**model_params)
     user_model.load_state_dict(torch.load(model_save_path))
 
-    # debug: for saving gpu space
-    # user_model = user_model.to(device)
-    # user_model.device = device
-    # user_model.linear_model.device = device
-    # user_model.linear.device = device
-
-    if hasattr(user_model, 'ab_embedding_dict') and args.is_ab:
-        alpha_u = user_model.ab_embedding_dict["alpha_u"].weight.detach().cpu().numpy()
-        beta_i = user_model.ab_embedding_dict["beta_i"].weight.detach().cpu().numpy()
-    else:
-        print("Note there are no available alpha and beta！！")
-        alpha_u = np.ones([7176, 1])
-        beta_i = np.ones([10729, 1])
-
-    # env = gym.make('VirtualTB-v0')
+    user_model = user_model.to(device)
+    user_model.device = device
+    user_model.linear_model.device = device
+    for linear_model in user_model.linear_model_task:
+        linear_model.device = device
 
     # %% 3. prepare envs
-    mat, lbe_user, lbe_photo, list_feat, df_photo_env, df_dist_small = KuaishouEnv.load_mat()
     register(
-        id=args.env,  # 'KuaishouEnv-v0',
-        entry_point='environments.KuaishouRec.env.kuaishouEnv:KuaishouEnv',
-        kwargs={"mat": mat,
-                "lbe_user": lbe_user,
-                "lbe_photo": lbe_photo,
-                "num_leave_compute": args.num_leave_compute,
+        id=args.env,  # 'VirtualTB-v0',
+        entry_point='environments.VirtualTaobao.virtualTB.envs:VirtualTB',
+        kwargs={"num_leave_compute": args.num_leave_compute,
                 "leave_threshold": args.leave_threshold,
-                "max_turn": args.max_turn,
-                "list_feat": list_feat,
-                "df_photo_env": df_photo_env,
-                "df_dist_small": df_dist_small}
+                "max_turn": args.max_turn}
     )
-    env = gym.make(args.env)
-
-    # normed_mat = KuaishouEnv.compute_normed_reward(user_model, lbe_user, lbe_photo, df_photo_env,)
-    mat_save_path = os.path.join(USERMODEL_Path, "normed_mat-{}.pickle".format(args.read_message))
-    with open(mat_save_path, "rb") as file:
-        normed_mat = pickle.load(file)
     register(
         id='SimulatedEnv-v0',
         entry_point='core.env.simulatedEnv.simulated_env:SimulatedEnv',
@@ -198,12 +172,12 @@ def main(args):
                 "task_name": args.env,
                 "version": args.version,
                 "tau": args.tau,
-                "alpha_u": alpha_u,
-                "beta_i": beta_i,
-                "normed_mat": normed_mat,
                 "gamma_exposure": args.gamma_exposure}
     )
 
+    env = gym.make('VirtualTB-v0')
+
+    # test env
     simulatedEnv = gym.make("SimulatedEnv-v0")
     state_shape = simulatedEnv.observation_space.shape or simulatedEnv.observation_space.n
     action_shape = simulatedEnv.action_space.shape or simulatedEnv.action_space.n
@@ -218,13 +192,12 @@ def main(args):
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     train_envs.seed(args.seed)
-    # test_envs.seed(args.seed)
+    test_envs.seed(args.seed)
 
     # %% 4. Setup model
-
     user_columns, action_columns, feedback_columns, \
     has_user_embedding, has_action_embedding, has_feedback_embedding = \
-        get_dataset_columns(args.dim_model, envname=args.env, env=env)
+        get_dataset_columns(args.dim_model, envname=args.env)
 
     assert args.dim_model == compute_input_dim(action_columns)
     state_tracker = StateTrackerTransformer(user_columns, action_columns, feedback_columns,
@@ -237,8 +210,10 @@ def main(args):
                                             nhead=args.nhead, d_hid=128, nlayers=2, dropout=0.1,
                                             device=device, seed=args.seed, MAX_TURN=args.max_turn).to(device)
 
+    # net1 = Net(state_shape, hidden_sizes=args.hidden_sizes, device=device)
+    # net1 = Net(args.dim_state, hidden_sizes=args.hidden_sizes, device=device)
     net = Net(args.dim_state, hidden_sizes=args.hidden_sizes, device=device)
-    actor = Actor(net, env.mat.shape[1], device=device).to(device)
+    actor = ActorProb(net, action_shape, max_action=max_action, device=device).to(device)
     critic = Critic(net, device=device).to(device)
     # critic = Critic(Net(state_shape, hidden_sizes=args.hidden_sizes, device=device), device=device).to(device)
 
@@ -256,9 +231,11 @@ def main(args):
 
     # replace DiagGuassian with Independent(Normal) which is equivalent
     # pass *logits to be consistent with policy.forward
-    
-    dist = torch.distributions.Categorical
-    
+
+    def dist(*logits):
+        return Independent(Normal(*logits), 1)
+  
+
     policy = PPOPolicy(
         actor, critic, optim, dist,
         discount_factor=args.gamma,
@@ -273,10 +250,7 @@ def main(args):
         # dual clip cause monotonically increasing log_std :)
         value_clip=args.value_clip,
         gae_lambda=args.gae_lambda,
-        action_space=simulatedEnv.action_space,
-        action_bound_method="" if args.env == "KuaishouEnv-v0" else "clip",
-        action_scaling=False if args.env == "KuaishouEnv-v0" else True
-    )
+        action_space=simulatedEnv.action_space)
 
     # %% 5. Prepare the collectors and logs
     train_collector = Collector(
@@ -291,6 +265,7 @@ def main(args):
 
     # log
     log_path = os.path.join(MODEL_SAVE_PATH)
+
     writer = SummaryWriter(log_path)
     logger1 = BasicLogger(writer, save_interval=args.save_interval)
 
@@ -323,7 +298,6 @@ def main(args):
     policy.callbacks = [History()] + [LoggerCallback_RL(logger_path)]
 
     # %% 6. Learn the model
-
     model_save_path = os.path.join(MODEL_SAVE_PATH, "{}_{}.pt".format(args.model_name, args.message))
 
     result = onpolicy_trainer(policy, train_collector, test_collector, state_tracker,
@@ -344,14 +318,14 @@ def main(args):
 
     # %% 7. save info
 
-    # model_save_path = os.path.join(MODEL_SAVE_PATH, "{}_{}.pt".format(args.model_name, args.message))
+
     # torch.save(model.state_dict(), model_save_path)
     torch.save({
         'policy': policy.cpu().state_dict(),
         'optim_RL': optim[0].state_dict(),
         'optim_state': optim[1].state_dict(),
         'state_tracker': state_tracker.cpu().state_dict(),
-    }, model_save_path)
+    },model_save_path)
 
     REMOTE_ROOT = "/root/Counterfactual_IRS"
     LOCAL_PATH = logger_path
@@ -370,6 +344,7 @@ def save_model_fn(epoch, policy, model_save_path, optim, state_tracker, is_save=
         'optim_state': optim[1].state_dict(),
         'state_tracker': state_tracker.state_dict(),
     }, model_save_path)
+
 
 if __name__ == '__main__':
     args = get_args()
