@@ -52,7 +52,7 @@ class StateTrackerBase(nn.Module):
                  has_user_embedding=True, has_action_embedding=True, has_feedback_embedding=False,
                  dataset="VirtualTB-v0",
                  device='cpu', seed=2021,
-                 init_std=0.0001, MAX_TURN=100):
+                 init_std=0.0001):
         super(StateTrackerBase, self).__init__()
         torch.manual_seed(seed)
 
@@ -64,7 +64,6 @@ class StateTrackerBase(nn.Module):
         self.reg_loss = torch.zeros((1,), device=device)
         self.aux_loss = torch.zeros((1,), device=device)
         self.device = device
-        self.MAX_TURN = MAX_TURN
 
         self.has_user_embedding = has_user_embedding
         self.has_action_embedding = has_action_embedding
@@ -140,8 +139,10 @@ class StateTrackerTransformer(StateTrackerBase):
                                                       has_action_embedding=has_action_embedding,
                                                       has_feedback_embedding=has_feedback_embedding,
                                                       dataset=dataset,
-                                                      device=device, seed=seed, init_std=init_std, MAX_TURN=MAX_TURN)
+                                                      device=device, seed=seed, init_std=init_std)
         self.dim_model = dim_model
+        self.MAX_TURN = MAX_TURN + 1  # For user will take an additional slut.
+
         self.ffn_user = nn.Linear(compute_input_dim(user_columns),
                                   dim_model, device=device)
         # self.fnn_gate = nn.Linear(3 * compute_input_dim(action_columns),
@@ -150,7 +151,7 @@ class StateTrackerTransformer(StateTrackerBase):
                                   dim_model, device=device)
         self.sigmoid = nn.Sigmoid()
 
-        self.pos_encoder = PositionalEncoding(dim_model, dropout)
+        self.pos_encoder = PositionalEncoding(dim_model, dropout, max_len=self.MAX_TURN)
         encoder_layers = TransformerEncoderLayer(dim_model, nhead, d_hid, dropout)
         self.transformer_encoder = TransformerEncoder(encoder_layers, nlayers)
 

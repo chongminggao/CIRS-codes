@@ -75,7 +75,7 @@ def get_args():
 
     parser.add_argument('--leave_threshold', default=0, type=int)
     parser.add_argument('--num_leave_compute', default=1, type=int)
-    parser.add_argument('--max_turn', default=30, type=int)
+    parser.add_argument('--max_turn', default=3, type=int)
 
     # state_tracker
     parser.add_argument('--dim_state', default=20, type=int)
