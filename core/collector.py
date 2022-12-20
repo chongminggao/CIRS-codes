@@ -52,6 +52,8 @@ class Collector(object):
             buffer: Optional[ReplayBuffer] = None,
             preprocess_fn: Optional[Callable[..., Batch]] = None,
             exploration_noise: bool = False,
+            remove_recommended_ids=False,
+            force_length=0,
     ) -> None:
         super().__init__()
         if isinstance(env, gym.Env) and not hasattr(env, "__len__"):
@@ -66,6 +68,9 @@ class Collector(object):
         self._action_space = env.action_space
         # avoid creating attribute outside __init__
         self.reset()
+
+        self.remove_recommended_ids = remove_recommended_ids
+        self.force_length = force_length
 
     def _assign_buffer(self, buffer: Optional[ReplayBuffer]) -> None:
         """Check if the buffer matches the constraint."""
@@ -210,6 +215,7 @@ class Collector(object):
         if render:
             render_list = []
 
+        cnt_loop = 0
         while True:
             assert len(self.data) == len(ready_env_ids)
             # restore the state: if the last state is None, it won't store
@@ -223,11 +229,12 @@ class Collector(object):
                 if no_grad:
                     with torch.no_grad():  # faster than retain_grad version
                         # self.data.obs will be used by agent to get result
-                        result = self.policy(self.data, last_state)
+                        # result = self.policy(self.data, last_state)
+                        result = self.policy(self.data, self.buffer, state=last_state, remove_recommended_ids=self.remove_recommended_ids)
                 else:
-                    result = self.policy(self.data, last_state)
+                    result = self.policy(self.data, self.buffer, state=last_state, remove_recommended_ids=self.remove_recommended_ids)
                 # update state / act / policy into self.data
-                policy = result.get("policy", Batch())  # Todo: 这里在pg下是空的！
+                policy = result.get("policy", Batch())
                 assert isinstance(policy, Batch)
                 state = result.get("state", None)
                 if state is not None:
@@ -242,6 +249,13 @@ class Collector(object):
             # step in env
             obs_next, rew, done, info = self.env.step(
                 action_remap, ready_env_ids)  # type: ignore
+
+            cnt_loop += 1
+            if self.force_length > 0:
+                if cnt_loop >= self.force_length:
+                    done = np.ones_like(done, dtype=bool)
+                else:
+                    done = np.zeros_like(done, dtype=bool)
 
             self.data.update(obs_next=obs_next, rew=rew, done=done, info=info)
             if self.preprocess_fn:
@@ -312,11 +326,28 @@ class Collector(object):
         #                       obs_next={}, info={}, policy={})
         #     self.reset_env() # The reset will be run after parameter update!!
 
+        # if episode_count > 0:
+        #     rews, lens, idxs = list(map(
+        #         np.concatenate, [episode_rews, episode_lens, episode_start_indices]))
+        # else:
+        #     rews, lens, idxs = np.array([]), np.array([], int), np.array([], int)
+        #
+        # res = {
+        #     "n/ep": episode_count,
+        #     "n/st": step_count,
+        #     "rews": rews,
+        #     "lens": lens,
+        #     "idxs": idxs,
+        # }
+
         if episode_count > 0:
             rews, lens, idxs = list(map(
                 np.concatenate, [episode_rews, episode_lens, episode_start_indices]))
+            rew_mean, rew_std = rews.mean(), rews.std()
+            len_mean, len_std = lens.mean(), lens.std()
         else:
             rews, lens, idxs = np.array([]), np.array([], int), np.array([], int)
+            rew_mean = rew_std = len_mean = len_std = 0
 
         res = {
             "n/ep": episode_count,
@@ -324,6 +355,10 @@ class Collector(object):
             "rews": rews,
             "lens": lens,
             "idxs": idxs,
+            "rew": rew_mean,
+            "len": len_mean,
+            "rew_std": rew_std,
+            "len_std": len_std,
         }
 
         if render:

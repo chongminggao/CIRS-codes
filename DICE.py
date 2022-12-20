@@ -22,19 +22,21 @@ from torch import nn
 
 from core.inputs import SparseFeatP
 from core.user_model_DICE import UserModel_DICE
-from core.util import compute_exposure_each_user, negative_sampling, get_similarity_mat
+from core.util import compute_exposure_each_user, negative_sampling, get_similarity_mat, \
+    load_static_validate_data_kuaishou
 from deepctr_torch.inputs import DenseFeat
 import pandas as pd
 import numpy as np
 from tensorflow.python.keras.callbacks import Callback
 
-from core.user_model import StaticDataset
+from core.static_dataset import StaticDataset
 
 import logzero
 from logzero import logger
 
+from environments.KuaishouRec.env.data_handler import get_training_item_domination
 from environments.KuaishouRec.env.kuaishouEnv import KuaishouEnv
-from evaluation import test_kuaishou
+from evaluation import test_kuaishou, test_static_model_in_RL_env
 # from util.upload import my_upload
 from util.utils import create_dir, LoggerCallback_Update
 
@@ -54,6 +56,10 @@ def get_args():
     parser.set_defaults(is_softmax=True)
 
     parser.add_argument('--l2_reg_dnn', default=0.1, type=float)
+
+    parser.add_argument("--num_trajectory", type=int, default=200)
+    parser.add_argument("--force_length", type=int, default=10)
+    parser.add_argument('--epsilon', default=0, type=float)
 
     parser.add_argument("--feature_dim", type=int, default=16)
     parser.add_argument("--entity_dim", type=int, default=16)
@@ -181,62 +187,6 @@ def load_dataset_kuaishou_DICE(entity_dim, feature_dim, MODEL_SAVE_PATH):
 
     return dataset, x_columns, y_columns
 
-
-def load_static_validate_data_kuaishou(entity_dim, feature_dim):
-    filename = os.path.join(DATAPATH, "small_matrix.csv")
-    df_small = pd.read_csv(filename, usecols=['user_id', 'photo_id', 'watch_ratio', 'photo_duration'])
-    df_small['photo_duration'] /= 1000
-
-    featurepath = os.path.join(DATAPATH, 'item_categories.json')
-    with open(featurepath, 'r') as file:
-        data_feat = json.load(file)
-    print("number of items:", len(data_feat))
-    list_feat = [0] * len(data_feat)
-    for i in range(len(data_feat)):
-        # list_feat[i] = set(data_feat[str(i)]['feature_index'])
-        list_feat[i] = data_feat[str(i)]['feature_index']
-
-    df_feat = pd.DataFrame(list_feat, columns=['feat0', 'feat1', 'feat2', 'feat3'], dtype=int)
-    df_feat.index.name = "photo_id"
-    df_feat[df_feat.isna()] = -1
-    df_feat = df_feat + 1
-    df_feat = df_feat.astype(int)
-
-    df_small = df_small.join(df_feat, on=['photo_id'], how="left")
-    df_small.loc[df_small['watch_ratio'] > 5, 'watch_ratio'] = 5
-
-    user_features = ["user_id"]
-    item_features = ["photo_id"] + ["feat" + str(i) for i in range(4)] + ["photo_duration"]
-    reward_features = ["watch_ratio"]
-
-    col_names = user_features + item_features + reward_features
-
-    df_x, df_y = df_small[user_features + item_features], df_small[reward_features]
-
-    x_columns = [SparseFeatP("user_id", df_small['user_id'].max() + 1, embedding_dim=entity_dim)] + \
-                [SparseFeatP("photo_id", df_small['photo_id'].max() + 1, embedding_dim=entity_dim)] + \
-                [SparseFeatP("feat{}".format(i),
-                             df_feat.max().max() + 1,
-                             embedding_dim=feature_dim,
-                             embedding_name="feat",  # Share the same feature!
-                             padding_idx=0  # using padding_idx in embedding!
-                             ) for i in range(4)] + \
-                [DenseFeat("photo_duration", 1)]
-
-    y_columns = [DenseFeat("y", 1)]
-
-    photo_mean_duration_path = os.path.join(DATAPATH, "photo_mean_duration.json")
-    with open(photo_mean_duration_path, 'r') as file:
-        photo_mean_duration = json.load(file)
-    photo_mean_duration = {int(k): v for k, v in photo_mean_duration.items()}
-
-    dataset_val = StaticDataset(x_columns, y_columns, num_workers=4)
-    dataset_val.compile_dataset(df_x, df_y)
-    dataset_val.set_env_items(df_small, df_feat, photo_mean_duration)
-
-    return dataset_val
-
-
 def main(args):
     args.entity_dim = args.feature_dim
     # %% 1. Create dirs
@@ -273,7 +223,7 @@ def main(args):
     static_dataset, x_columns, y_columns = load_dataset_kuaishou_DICE(args.entity_dim, args.feature_dim,
                                                                       MODEL_SAVE_PATH)
 
-    dataset_val = load_static_validate_data_kuaishou(args.entity_dim, args.feature_dim)
+    dataset_val = load_static_validate_data_kuaishou(args.entity_dim, args.feature_dim, DATAPATH)
 
     # %% 4. Setup model
     device = torch.device("cuda:{}".format(args.cuda) if torch.cuda.is_available() else "cpu")
@@ -294,13 +244,17 @@ def main(args):
                                                                                  torch.from_numpy(y_predict)).numpy()},
                   metrics=None)  # No evaluation step at offline stage
 
+    item_feat_domination = get_training_item_domination()
     model.compile_RL_test(
-        functools.partial(test_kuaishou, env=env, dataset_val=dataset_val, is_softmax=args.is_softmax))
+        functools.partial(test_static_model_in_RL_env, env=env, dataset_val=dataset_val, is_softmax=args.is_softmax,
+                          epsilon=args.epsilon, is_ucb=False, need_transform=True,
+                          num_trajectory=args.num_trajectory, item_feat_domination=item_feat_domination,
+                          force_length=args.force_length))
 
     # %% 5. Learn model
     history = model.fit_data(static_dataset, dataset_val,
                              batch_size=args.batch_size, epochs=args.epoch,
-                             callbacks=[[LoggerCallback_Update(logger_path)]])
+                             callbacks=[LoggerCallback_Update(logger_path)])
     logger.info(history.history)
 
     model_parameters = {"feature_columns": x_columns, "y_columns": y_columns, "num_tasks": len(tasks), "tasks": tasks,

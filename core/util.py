@@ -14,7 +14,7 @@ from scipy.sparse import csr_matrix, lil_matrix
 from tqdm import tqdm
 
 from core.inputs import SparseFeatP
-from core.user_model import StaticDataset
+from core.static_dataset import StaticDataset
 from deepctr_torch.inputs import DenseFeat
 
 

@@ -21,10 +21,10 @@ from tianshou.utils import tqdm_config, MovAvg, BaseLogger, LazyLogger
 
 from tensorflow.python.keras.callbacks import History
 
-try:
-    from tensorflow.python.keras.callbacks import CallbackList
-except ImportError:
-    from tensorflow.python.keras._impl.keras.callbacks import CallbackList
+# try:
+#     from tensorflow.python.keras.callbacks import CallbackList
+# except ImportError:
+#     from tensorflow.python.keras._impl.keras.callbacks import CallbackList
 
 
 def onpolicy_trainer(
@@ -111,6 +111,7 @@ def onpolicy_trainer(
     if save_fn:
         warnings.warn("Please consider using save_checkpoint_fn instead of save_fn.")
 
+    # start_epoch, env_step, gradient_step = 0, 0, 0
     start_epoch, env_step, gradient_step = 0, 0, 0
     if resume_from_log:
         start_epoch, env_step, gradient_step = logger.restore_data()
@@ -120,23 +121,33 @@ def onpolicy_trainer(
     train_collector.reset_stat()
     test_collector.reset_stat()
     test_in_train = test_in_train and train_collector.policy == policy
+    # test_result = test_episode(policy, test_collector, test_fn, start_epoch,
+    #                            episode_per_test, logger, env_step, reward_metric)
     test_result = test_episode(policy, test_collector, test_fn, start_epoch,
-                               episode_per_test, logger, env_step, reward_metric)
+                               episode_per_test, logger, None, reward_metric)
     best_epoch = start_epoch
     best_reward, best_reward_std = test_result["rew"], test_result["rew_std"]
 
     # add callbacks
-    callbacks = CallbackList(policy.callbacks)
-    callbacks.set_model(policy)
-    callbacks.on_train_begin()
-    if not hasattr(callbacks, 'model'):  # for tf1.4
-        callbacks.__setattr__('model', policy)
-    callbacks.model.stop_training = False
+    # callbacks = CallbackList(policy.callbacks)
+    # callbacks.set_model(policy)
+    # callbacks =
+
+    # callbacks.on_train_begin()
+
+    for callback in policy.callbacks:
+        callback.on_train_begin()
+
+    # if not hasattr(callbacks, 'model'):  # for tf1.4
+    #     callbacks.__setattr__('model', policy)
+    # callbacks.model.stop_training = False
 
     for epoch in range(1 + start_epoch, 1 + max_epoch):
         # train
         policy.train()
-        callbacks.on_epoch_begin(epoch)
+        # callbacks.on_epoch_begin(epoch)
+        for callback in policy.callbacks:
+            callback.on_epoch_begin(epoch)
         torch.autograd.set_detect_anomaly(True)
 
         with tqdm.tqdm(
@@ -149,7 +160,7 @@ def onpolicy_trainer(
                                                  n_episode=episode_per_collect)
                 if result["n/ep"] > 0 and reward_metric:
                     result["rews"] = reward_metric(result["rews"])
-                env_step += int(result["n/st"])
+                env_step = None if env_step is None else (env_step + int(result["n/st"]))
                 t.update(result["n/st"])
                 logger.log_train_data(result, env_step)
                 last_rew = result['rew'] if 'rew' in result else last_rew
@@ -163,9 +174,12 @@ def onpolicy_trainer(
                 }
                 if result["n/ep"] > 0:
                     if test_in_train and stop_fn and stop_fn(result["rew"]):
+                        # test_result = test_episode(
+                        #     policy, test_collector, test_fn,
+                        #     epoch, episode_per_test, logger, env_step)
                         test_result = test_episode(
                             policy, test_collector, test_fn,
-                            epoch, episode_per_test, logger, env_step)
+                            epoch, episode_per_test, logger, None)
                         if stop_fn(test_result["rew"]):
                             if save_fn:
                                 save_fn(policy)
@@ -208,8 +222,10 @@ def onpolicy_trainer(
             if t.n <= t.total:
                 t.update()
         # test
+        # test_result = test_episode(policy, test_collector, test_fn, epoch,
+        #                            episode_per_test, logger, env_step, reward_metric)
         test_result = test_episode(policy, test_collector, test_fn, epoch,
-                                   episode_per_test, logger, env_step, reward_metric)
+                                   episode_per_test, logger, None, reward_metric)
         rew, rew_std = test_result["rew"], test_result["rew_std"]
         if best_epoch < 0 or best_reward < rew:
             best_epoch, best_reward, best_reward_std = epoch, rew, rew_std
@@ -217,7 +233,9 @@ def onpolicy_trainer(
                 save_fn(policy)
         logger.save_data(epoch, env_step, gradient_step, save_checkpoint_fn)
 
-        callbacks.on_epoch_end(epoch, test_result)
+        # callbacks.on_epoch_end(epoch, test_result)
+        for callback in policy.callbacks:
+            callback.on_epoch_end(epoch, test_result)
         save_model_fn(epoch=epoch, policy=policy)
 
         if verbose:
@@ -226,7 +244,9 @@ def onpolicy_trainer(
         if stop_fn and stop_fn(best_reward):
             break
 
-    callbacks.on_train_end()
+    # callbacks.on_train_end()
+    for callback in policy.callbacks:
+        callback.on_train_end()
 
     return gather_info(start_time, train_collector, test_collector,
                        best_reward, best_reward_std)

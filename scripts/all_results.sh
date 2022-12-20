@@ -19,12 +19,12 @@
 
 
 # KuaiEnv, Length == 50
-#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --is_softmax --message "DeepFM+Softmax" &
-#python DICE.py                    --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "DICE"  &
-#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 0.9 --not_softmax --message "K_epsilon-greedy" &
-#python DeepFM-IPS-pairwise.py     --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "IPS"   &
-#python PD-pairwise.py             --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "PD"    &
-#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 1.0 --not_softmax --message "K_Random" &
+#python CIRS-UserModel-kuaishou.py --cuda 0 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --is_softmax --message "DeepFM+Softmax" &
+python DICE.py                    --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "DICE"  &
+#python CIRS-UserModel-kuaishou.py --cuda 2 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 0.9 --not_softmax --message "K_epsilon-greedy" &
+python DeepFM-IPS-pairwise.py     --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "IPS"   &
+python PD-pairwise.py             --cuda 3 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "PD"    &
+#python CIRS-UserModel-kuaishou.py --cuda 0 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 1.0 --not_softmax --message "K_Random" &
 #python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --not_softmax --is_ucb --message "UCB" &
 
 
@@ -46,9 +46,9 @@
 #python CIRS-RL-taobao.py --cuda 0  --max_turn 10 --epoch 200 --tau 0 --leave_threshold 1 --num_leave_compute 5 --read_message "taobao tau 0" --message "T_CIRSwoCI_len10" &
 ##
 ##
-### KuaiEnv, Length == 30
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 1 --tau 10    --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRS_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 0     --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCI_len30" &
+## KuaiEnv, Length == 30
+#python3.9 "CIRS-RL-kuaishou.py"   --cuda 0 --tau 10    --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRS_len30" &
+#python3.9 "CIRS-RL-kuaishou.py"   --cuda 1 --tau 0     --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCI_len30" &
 ##
 ##
 ### KuaiEnv, Length == 100

@@ -25,7 +25,7 @@ import pandas as pd
 import numpy as np
 from tensorflow.python.keras.callbacks import Callback
 
-from core.user_model import StaticDataset
+from core.static_dataset import StaticDataset
 from core.user_model_mmoe import UserModel_MMOE
 import logzero
 from logzero import logger
@@ -167,7 +167,7 @@ def main(args):
     # %% 4. Learn the model
     history = model.fit_data(static_dataset,
                              batch_size=args.batch_size, epochs=args.epoch,
-                             callbacks=[[LoggerCallback_Update(logger_path)]])
+                             callbacks=[LoggerCallback_Update(logger_path)])
     logger.info(history.history)
 
     model_parameters = {"feature_columns": x_columns, "y_columns": y_columns, "num_tasks": len(tasks), "tasks": tasks,

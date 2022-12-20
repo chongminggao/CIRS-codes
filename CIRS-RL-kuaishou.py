@@ -15,6 +15,7 @@ import torch
 import argparse
 import numpy as np
 
+from core.collector_set import CollectorSet
 from core.inputs import get_dataset_columns
 
 from tensorflow.python.keras.callbacks import Callback
@@ -29,6 +30,7 @@ from core.state_tracker import StateTrackerTransformer
 from core.user_model import compute_input_dim
 from core.policy.ppo import PPOPolicy
 from core.user_model_pairwise import UserModel_Pairwise
+from environments.KuaishouRec.env.data_handler import get_df_kuairec, get_training_item_domination, load_item_feat
 from environments.KuaishouRec.env.kuaishouEnv import KuaishouEnv
 from tianshou.utils import BasicLogger
 from tianshou.env import DummyVectorEnv
@@ -42,8 +44,9 @@ from tianshou.utils.net.discrete import Actor, Critic
 import logzero
 from logzero import logger
 
+from evaluation import Callback_Coverage_Count
 # from util.upload import my_upload
-from util.utils import create_dir, LoggerCallback_RL
+from util.utils import create_dir, LoggerCallback_RL, LoggerCallback_Policy
 
 from gym.envs.registration import register
 
@@ -82,6 +85,7 @@ def get_args():
     parser.add_argument('--dim_model', default=32, type=int)
     parser.add_argument('--nhead', default=4, type=int)
     # parser.add_argument('--max_len', default=100, type=int)
+    parser.add_argument('--force_length', type=int, default=10)
 
     # tianshou
     parser.add_argument('--buffer-size', type=int, default=11000)
@@ -212,8 +216,16 @@ def main(args):
     train_envs = DummyVectorEnv(
         [lambda: gym.make("SimulatedEnv-v0", ) for _ in range(args.training_num)])
     # test_envs = gym.make(args.task)
+    # test_envs = DummyVectorEnv(
+    #     [lambda: gym.make(args.env) for _ in range(args.test_num)])
     test_envs = DummyVectorEnv(
         [lambda: gym.make(args.env) for _ in range(args.test_num)])
+    test_envs_NX_0 = DummyVectorEnv(
+        [lambda: gym.make(args.env) for _ in range(args.test_num)])
+    test_envs_NX_x = DummyVectorEnv(
+        [lambda: gym.make(args.env) for _ in range(args.test_num)])
+
+    test_envs_dict = {"FB": test_envs, "NX_0": test_envs_NX_0, f"NX_{args.force_length}": test_envs_NX_x}
 
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -261,6 +273,7 @@ def main(args):
     
     policy = PPOPolicy(
         actor, critic, optim, dist,
+        # state_tracker=state_tracker,
         discount_factor=args.gamma,
         max_grad_norm=args.max_grad_norm,
         eps_clip=args.eps_clip,
@@ -284,10 +297,13 @@ def main(args):
         VectorReplayBuffer(args.buffer_size, len(train_envs)),
         preprocess_fn=state_tracker.build_state
     )
-    test_collector = Collector(
-        policy, test_envs,
-        preprocess_fn=state_tracker.build_state
-    )
+    # test_collector = Collector(
+    #     policy, test_envs,
+    #     preprocess_fn=state_tracker.build_state
+    # )
+    test_collector_set = CollectorSet(policy, test_envs_dict, args.buffer_size, args.test_num,
+                                      preprocess_fn=state_tracker.build_state,
+                                      force_length=args.force_length)
 
     # log
     log_path = os.path.join(MODEL_SAVE_PATH)
@@ -320,13 +336,22 @@ def main(args):
     #     else:
     #         print("Fail to restore policy and optim.")
 
-    policy.callbacks = [History()] + [LoggerCallback_RL(logger_path)]
+    # policy.callbacks = [LoggerCallback_RL(logger_path)]
+
+    # df_val, df_user_val, df_item_val, list_feat = get_df_kuairec(name="small_matrix.csv")
+    df_item_val = load_item_feat(only_small=True)
+    item_feat_domination = get_training_item_domination()
+
+    policy.callbacks = [
+        Callback_Coverage_Count(test_collector_set, df_item_val, need_transform=True, item_feat_domination=item_feat_domination,
+                                lbe_photo=env.lbe_photo),
+        LoggerCallback_Policy(logger_path, args.force_length)]
 
     # %% 6. Learn the model
 
     model_save_path = os.path.join(MODEL_SAVE_PATH, "{}_{}.pt".format(args.model_name, args.message))
 
-    result = onpolicy_trainer(policy, train_collector, test_collector, state_tracker,
+    result = onpolicy_trainer(policy, train_collector, test_collector_set, state_tracker,
                               args.epoch, args.step_per_epoch,
                               args.repeat_per_collect, args.test_num, args.batch_size,
                               episode_per_collect=args.episode_per_collect,
@@ -363,7 +388,7 @@ def save_model_fn(epoch, policy, model_save_path, optim, state_tracker, is_save=
     if not is_save:
         return
     model_save_path = model_save_path[:-3] + "-e{}".format(epoch) + model_save_path[-3:]
-    # torch.save(model.state_dict(), model_save_path)
+    # torch.save(model.state_dict(), model_save_pa™th)
     torch.save({
         'policy': policy.state_dict(),
         'optim_RL': optim[0].state_dict(),

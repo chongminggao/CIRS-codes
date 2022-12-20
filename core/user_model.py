@@ -5,81 +5,26 @@
 import pickle
 import time
 
-import pandas as pd
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.utils.data as Data
 from sklearn.metrics import *
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from core.inputs import SparseFeatP
 from core.layers import Linear
-import warnings
 
-
-try:
-    from tensorflow.python.keras.callbacks import CallbackList
-except ImportError:
-    from tensorflow.python.keras._impl.keras.callbacks import CallbackList
+# try:
+#     from tensorflow.python.keras.callbacks import CallbackList
+# except ImportError:
+#     from tensorflow.python.keras._impl.keras.callbacks import CallbackList
 
 from deepctr_torch.inputs import build_input_features, DenseFeat, VarLenSparseFeat, get_varlen_pooling_list, \
     varlen_embedding_lookup
-from deepctr_torch.layers import PredictionLayer
 # from ..layers.utils import slice_arrays
 from deepctr_torch.callbacks import History
-
-
-class StaticDataset(Dataset):
-    def __init__(self, x_columns, y_columns, num_workers=4):
-        self.x_columns = x_columns
-        self.y_columns = y_columns
-
-        self.num_workers = num_workers
-
-        self.len = 0
-        self.neg_items_info = None
-
-    def set_env_items(self, df_small, df_feat, photo_mean_duration):  # for kuaishou data
-        photo_list = df_small['photo_id'].unique()
-        self.df_photo_env = df_feat.loc[photo_list]
-        self.df_photo_env['photo_duration'] = np.array(
-            list(map(lambda x: photo_mean_duration[x], self.df_photo_env.index)))
-
-    def compile_dataset(self, df_x, df_y, score=None):
-        self.x_numpy = df_x.to_numpy()
-        self.y_numpy = df_y.to_numpy()
-
-        if score is None:
-            self.score = np.zeros([len(self.x_numpy), 1])
-        else:
-            self.score = score
-
-        self.len = len(self.x_numpy)
-
-    def get_dataset_train(self):
-        dataset = torch.utils.data.TensorDataset(torch.from_numpy(self.x_numpy),
-                                                 torch.from_numpy(self.y_numpy),
-                                                 torch.from_numpy(self.score))
-        return dataset
-
-    def get_dataset_eval(self):
-        dataset = torch.utils.data.TensorDataset(torch.from_numpy(self.x_numpy),
-                                                 torch.from_numpy(self.y_numpy))
-        return dataset
-
-    def get_y(self):
-        return self.y_numpy
-
-    def __len__(self) -> int:
-        return self.len
-
-    def __getitem__(self, index: int):
-        x = self.x_numpy[index]
-        y = self.y_numpy[index]
-        return x, y
 
 
 class UserModel(nn.Module):
@@ -164,22 +109,39 @@ class UserModel(nn.Module):
         sample_num = len(dataset_train)
         steps_per_epoch = (sample_num - 1) // batch_size + 1
 
-        # configure callbacks
-        callbacks = (callbacks or []) + [self.history]  # add history callback
-        callbacks = CallbackList(callbacks)
-        callbacks.set_model(self)
-        callbacks.on_train_begin()
-        callbacks.set_model(self)
-        if not hasattr(callbacks, 'model'):  # for tf1.4
-            callbacks.__setattr__('model', self)
-        callbacks.model.stop_training = False
+        # # configure callbacks
+        # callbacks = (callbacks or []) + [self.history]  # add history callback
+        # callbacks = CallbackList(callbacks)
+        # callbacks.set_model(self)
+        # callbacks.on_train_begin()
+        # if not hasattr(callbacks, 'model'):  # for tf1.4
+        #     callbacks.__setattr__('model', self)
+        # callbacks.model.stop_training = False
+        for callback in callbacks:
+            callback.on_train_begin()
+
+        epoch_logs = {}
+        if dataset_val:
+            eval_result = self.evaluate_data(dataset_val, batch_size)
+            # for name, result in eval_result.items():
+            #     epoch_logs["val_" + name] = result
+            epoch_logs.update(eval_result)
+        if self.RL_eval_fun:
+            eval_result_RL = self.RL_eval_fun(self.eval())
+            # for name, result in eval_result_RL.items():
+            #     epoch_logs["RL_val_" + name] = result
+            epoch_logs.update(eval_result_RL)
+        for callback in callbacks:
+            callback.on_epoch_end(-1, epoch_logs)
 
         # Train
         print("Train on {0} samples, validate on {1} samples, {2} steps per epoch".format(
             len(dataset_train), 0 if dataset_val is None else len(dataset_val), steps_per_epoch))
         for epoch in range(initial_epoch, epochs):
             print("Training the {}/{} epoch".format(epoch, epochs))
-            callbacks.on_epoch_begin(epoch)
+            # callbacks.on_epoch_begin(epoch)
+            for callback in callbacks:
+                callback.on_epoch_begin(epoch)
             epoch_logs = {}
             start_time = time.time()
             loss_epoch = 0
@@ -248,12 +210,13 @@ class UserModel(nn.Module):
             if dataset_val:
                 eval_result = self.evaluate_data(dataset_val, batch_size)
                 for name, result in eval_result.items():
-                    epoch_logs["val_" + name] = result
-
+                    # epoch_logs["val_" + name] = result
+                    epoch_logs[name] = result
             if self.RL_eval_fun:
                 eval_result_RL = self.RL_eval_fun(self.eval())
                 for name, result in eval_result_RL.items():
-                    epoch_logs["RL_val_" + name] = result
+                    # epoch_logs["RL_val_" + name] = result
+                    epoch_logs[name] = result
 
             # verbose
             if verbose > 0:
@@ -270,13 +233,17 @@ class UserModel(nn.Module):
                 if dataset_val:
                     for name in self.metric_fun:
                         eval_str += " - " + "val_" + name + \
-                                    ": {0: .4f}".format(epoch_logs["val_" + name])
+                                    ": {0: .4f}".format(epoch_logs[name])
                 print(eval_str)
-            callbacks.on_epoch_end(epoch, epoch_logs)
-            if self.stop_training:
-                break
+            # callbacks.on_epoch_end(epoch, epoch_logs)
+            for callback in callbacks:
+                callback.on_epoch_end(epoch, epoch_logs)
+            # if self.stop_training:
+            #     break
 
-        callbacks.on_train_end()
+        # callbacks.on_train_end()
+        for callback in callbacks:
+            callback.on_train_end()
 
         return self.history
 
@@ -284,20 +251,55 @@ class UserModel(nn.Module):
         self.n_rec = n_arm
         self.n_each = np.ones(n_arm)
 
-    def recommend_k_item(self, user, dataset_val, k=1, is_softmax=True, epsilon=0, is_ucb=False):  # for kuaishou data
+    def recommend_k_item(self, user, dataset_val, k=1, is_softmax=True, epsilon=0, is_ucb=False, recommended_ids=[]):
 
-        df_photo_env = dataset_val.df_photo_env # 小数据集的feature
-        item_index = df_photo_env.index.to_numpy()
-        # 用户的所有评分
+        # df_user_val = dataset_val.df_user_val
+        df_item_val = dataset_val.df_photo_env
+
+        item_index = df_item_val.index.to_numpy()
+
+        # if not lbe_item is None:
+        #     recommended_ids = lbe_item.transform(recommended_items).tolist()
+        # else:
+        #     recommended_ids = recommended_items
+
+        # the preserved transformed ids.
+        indices = np.ones(len(item_index), dtype=bool)
+        indices[recommended_ids] = False
+        preserved_ids = np.arange(len(item_index))[indices]
+
+        # the preserved raw ids
+        item_index_preserved = item_index[indices]
+        df_item_val_preserved = df_item_val.iloc[indices]
+
         u_all_item = torch.tensor(
-            np.concatenate((np.ones([len(df_photo_env), 1]) * user,
-                            np.expand_dims(item_index, axis=-1),
-                            df_photo_env.values), 1),
+            np.concatenate((np.ones([len(df_item_val_preserved), 1]) * user,
+                            # df_user_val.loc[user].to_numpy() * np.array([[1]] * len(df_item_val_preserved)),
+                            np.expand_dims(item_index_preserved, axis=-1),
+                            df_item_val_preserved.values), 1),
             dtype=torch.float, device=self.device, requires_grad=False)
 
-        u_value = self.forward(u_all_item).detach().squeeze() # predicted value
+        assert u_all_item.shape[1] == len(dataset_val.x_columns)
 
-        if is_ucb:
+        # # 用户的所有评分
+        # if df_user is None:
+        #     u_all_item = torch.tensor(
+        #         np.concatenate((np.ones([len(df_item_val), 1]) * user,
+        #                         np.expand_dims(item_index, axis=-1),
+        #                         df_item_val.values), 1),
+        #         dtype=torch.float, device=self.device, requires_grad=False)
+        # else:
+        #     u_all_item = torch.tensor(
+        #         np.concatenate((np.ones([len(df_item_val), 1]) * user,
+        #                         df_user.loc[user].to_numpy() * np.array([[1]] * len(df_item_val)),
+        #                         np.expand_dims(item_index, axis=-1),
+        #                         df_item_val.values), 1),
+        #         dtype=torch.float, device=self.device, requires_grad=False)
+
+        mean = self.forward(u_all_item)
+        u_value = mean.detach().squeeze()  # predicted value
+
+        if is_ucb and len(recommended_ids) == 0:
             if not hasattr(self, "n_rec"):
                 self.compile_UCB(len(u_value))
 
@@ -308,36 +310,42 @@ class UserModel(nn.Module):
             # ucb_bound[np.isnan(ucb_bound)] = 0
             # ucb_bound[np.isinf(ucb_bound)] = u_value.max()
 
-            u_value_ucb = u_value + torch.Tensor(ucb_bound).to(u_value.device)
+            u_value = u_value + torch.Tensor(ucb_bound).to(u_value.device)
         else:
-            u_value_ucb = u_value
-
+            u_value = u_value
 
         if is_softmax:
-            value = self.softmax(u_value_ucb)
-            index = torch.multinomial(value, k, replacement=False)
+            value_softmax = self.softmax(u_value)
+            index_rec = torch.multinomial(value_softmax, k, replacement=False)
         else:
             # value = u_value
             # if min(value) < 0:
             #     value = -min(value) + value
             #     value = value / sum(value)
             # Todo:
-            index = u_value_ucb.argmax() # 预测分数的max
+            # index_rec = u_value.argmax() # 预测分数的max
+
+            # value = u_value/sum(u_value)
+            # index_rec = torch.multinomial(value, k, replacement=False)
+
+            _, index_rec = torch.topk(u_value, k)
 
         if epsilon > 0 and np.random.random() < epsilon:
             # # epsilon-greedy activated!!
-            index = torch.randint(0, len(item_index), (k,))
+            index_rec = torch.randint(0, len(u_value), (k,))
+
+        recommended_id_transform = preserved_ids[index_rec]
 
         if is_ucb:
             self.n_rec += k
-            self.n_each[index] += 1
+            self.n_each[recommended_id_transform] += 1
 
-        # print(int(index), end=' ')
+        # print(int(index_rec), end=' ')
 
-        recommendation = item_index[index]
-        value_rec = u_value.cpu().numpy()[index]
+        recommended_id_raw = item_index[recommended_id_transform]
+        value_rec = u_value.cpu().numpy()[index_rec]
 
-        return recommendation, value_rec
+        return recommended_id_transform, recommended_id_raw, value_rec
 
     def evaluate_data(self, dataset_val, batch_size=256):
 

@@ -18,8 +18,8 @@ import numpy as np
 from core.inputs import get_dataset_columns
 from core.user_model_mmoe import UserModel_MMOE
 
-from tensorflow.python.keras.callbacks import Callback
-from tensorflow.python.keras.callbacks import History
+# from tensorflow.python.keras.callbacks import Callback
+# from tensorflow.python.keras.callbacks import History
 
 from torch.distributions import Independent, Normal
 from torch.utils.tensorboard import SummaryWriter
@@ -294,7 +294,8 @@ def main(args):
     #     else:
     #         print("Fail to restore policy and optim.")
 
-    policy.callbacks = [History()] + [LoggerCallback_RL(logger_path)]
+    # policy.callbacks = [History()] + [LoggerCallback_RL(logger_path)]
+    policy.callbacks = [LoggerCallback_RL(logger_path)]
 
     # %% 6. Learn the model
     model_save_path = os.path.join(MODEL_SAVE_PATH, "{}_{}.pt".format(args.model_name, args.message))

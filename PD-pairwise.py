@@ -30,13 +30,14 @@ import pandas as pd
 import numpy as np
 from tensorflow.python.keras.callbacks import Callback
 
-from core.user_model import StaticDataset
+from core.static_dataset import StaticDataset
 
 import logzero
 from logzero import logger
 
+from environments.KuaishouRec.env.data_handler import get_training_item_domination
 from environments.KuaishouRec.env.kuaishouEnv import KuaishouEnv
-from evaluation import test_kuaishou
+from evaluation import test_kuaishou, test_static_model_in_RL_env
 # from util.upload import my_upload
 from util.utils import create_dir, LoggerCallback_Update
 
@@ -54,6 +55,10 @@ def get_args():
     parser.add_argument('--not_softmax', dest='is_softmax', action='store_false')
     parser.set_defaults(is_softmax=True)
     parser.add_argument('--l2_reg_dnn', default=0.1, type=float)
+
+    parser.add_argument("--num_trajectory", type=int, default=200)
+    parser.add_argument("--force_length", type=int, default=10)
+    parser.add_argument('--epsilon', default=0, type=float)
 
     parser.add_argument('--gamma', default=0.1, type=float)
 
@@ -236,13 +241,17 @@ def main(args):
                                                                                  torch.from_numpy(y_predict)).numpy()},
                   metrics=None)  # No evaluation step at offline stage
 
+    item_feat_domination = get_training_item_domination()
     model.compile_RL_test(
-        functools.partial(test_kuaishou, env=env, dataset_val=dataset_val, is_softmax=args.is_softmax))
+        functools.partial(test_static_model_in_RL_env, env=env, dataset_val=dataset_val, is_softmax=args.is_softmax,
+                          epsilon=args.epsilon, is_ucb=False, need_transform=True,
+                          num_trajectory=args.num_trajectory, item_feat_domination=item_feat_domination,
+                          force_length=args.force_length))
 
     # %% 5. Learn model
     history = model.fit_data(static_dataset, dataset_val,
                              batch_size=args.batch_size, epochs=args.epoch,
-                             callbacks=[[LoggerCallback_Update(logger_path)]])
+                             callbacks=[LoggerCallback_Update(logger_path)])
     logger.info(history.history)
 
     # model_parameters = {"feature_columns": x_columns, "y_columns": y_columns, "task": task,

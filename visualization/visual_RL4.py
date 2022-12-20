@@ -189,7 +189,10 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
     maxlen = [50, 100, 10, 30]
     fontsize = 11.5
 
-    all_method = sorted(set(df1['R_tra'].columns.to_list() + df2['R_tra'].columns.to_list()))
+    all_method = sorted(set(df1['R_tra'].columns.to_list() +
+                            df2['R_tra'].columns.to_list() +
+                            df3['R_tra'].columns.to_list() +
+                            df4['R_tra'].columns.to_list()))
 
     pattern="\[([KT]_)?(.+)\]"
     all_method_map = {}
@@ -199,11 +202,14 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
             all_method_map[method] = res.group(2)
     pprint.pprint(all_method_map)
 
-    colors = sns.color_palette(n_colors=len(all_method_map.values()))
-    markers = ["o", "s", "p", "P", "X", "*", "h", "D", "v", "^", ">", "<", "x", "H"]
+    methods_list = list(set(all_method_map.values()))
+    num_methods = len(methods_list)
 
-    color_kv = dict(zip(all_method_map.values(), colors))
-    marker_kv = dict(zip(all_method_map.values(), markers))
+    colors = sns.color_palette(n_colors=num_methods)
+    markers = ["o", "s", "p", "P", "X", "*", "h", "D", "v", "^", ">", "<", "x", "H"][:num_methods]
+
+    color_kv = dict(zip(methods_list, colors))
+    marker_kv = dict(zip(methods_list, markers))
 
     fig = plt.figure(figsize=(12, 7))
     # plt.subplots_adjust(wspace=0.3)
@@ -215,15 +221,15 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
         cnt = 1
         df = dfs[index]
 
-        df.columns()
-
+        new_name = {name:all_method_map[name] for name in df.columns.levels[1]}
+        df = df.rename(columns=new_name, level=1)
 
         data_r = df[visual_cols[0]]
         data_len = df[visual_cols[1]]
         data_ctr = df[visual_cols[2]]
 
-        color = [color_kv[all_method_map[name]] for name in data_r.columns]
-        marker = [marker_kv[all_method_map[name]] for name in data_r.columns]
+        color = [color_kv[name] for name in data_r.columns]
+        marker = [marker_kv[name] for name in data_r.columns]
 
         ax1 = plt.subplot2grid((3,4), (0,index))
         data_r.plot(kind="line", linewidth=1, ax=ax1, legend=None, color=color, markevery=int(len(data_r)/10), fillstyle='none', alpha=.8, markersize=3)

@@ -21,7 +21,7 @@ from deepctr_torch.inputs import DenseFeat
 import pandas as pd
 from keras.callbacks import Callback
 
-from core.user_model import StaticDataset
+from core.static_dataset import StaticDataset
 from core.user_model_mmoe import UserModel_MMOE
 import logzero
 from logzero import logger

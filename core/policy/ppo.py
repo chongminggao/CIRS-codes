@@ -8,6 +8,8 @@ from typing import Any, Dict, List, Type, Optional, Union
 from tianshou.policy import A2CPolicy
 from tianshou.data import Batch, ReplayBuffer, to_torch_as
 
+from core.policy.utils import get_recommended_ids, removed_recommended_id_from_embedding
+
 
 class PPOPolicy(A2CPolicy):
     r"""Implementation of Proximal Policy Optimization. arXiv:1707.06347.
@@ -66,6 +68,7 @@ class PPOPolicy(A2CPolicy):
             critic: torch.nn.Module,
             optim: Union[torch.optim.Optimizer, List[torch.optim.Optimizer]],
             dist_fn: Type[torch.distributions.Distribution],
+            # state_tracker,
             eps_clip: float = 0.2,
             dual_clip: Optional[float] = None,
             value_clip: bool = False,
@@ -85,6 +88,11 @@ class PPOPolicy(A2CPolicy):
         self._norm_adv = advantage_normalization
         self._recompute_adv = recompute_advantage
 
+        # self.state_tracker = state_tracker
+
+    def set_collector(self, train_collector):
+        self.train_collector = train_collector
+
     def process_fn(
             self, batch: Batch, buffer: ReplayBuffer, indice: np.ndarray
     ) -> Batch:
@@ -99,6 +107,61 @@ class PPOPolicy(A2CPolicy):
                 old_log_prob.append(self(b).dist.log_prob(b.act))
         batch.logp_old = torch.cat(old_log_prob, dim=0)
         return batch
+
+    def forward(
+        self,
+        batch: Batch,
+        buffer: ReplayBuffer=None,
+        remove_recommended_ids=False,
+        state: Optional[Union[dict, Batch, np.ndarray]] = None,
+        **kwargs: Any,
+    ) -> Batch:
+        """Compute action over the given batch data.
+
+        :return: A :class:`~tianshou.data.Batch` which has 4 keys:
+
+            * ``act`` the action.
+            * ``logits`` the network's raw output.
+            * ``dist`` the action distribution.
+            * ``state`` the hidden state.
+
+        .. seealso::
+
+            Please refer to :meth:`~tianshou.policy.BasePolicy.forward` for
+            more detailed explanation.
+        """
+        if remove_recommended_ids:
+            recommended_ids = get_recommended_ids(buffer)
+        else:
+            recommended_ids = None
+
+        logits, h = self.actor(batch.obs, state=state)
+
+        if remove_recommended_ids:
+            logits_masked, indices_masked = removed_recommended_id_from_embedding(logits, recommended_ids)
+        else:
+            logits_masked = logits
+
+        if isinstance(logits_masked, tuple):
+            dist = self.dist_fn(*logits_masked)
+        else:
+            dist = self.dist_fn(logits_masked)
+        if self._deterministic_eval and not self.training:
+            if self.action_type == "discrete":
+                act = logits_masked.argmax(-1)
+            elif self.action_type == "continuous":
+                act = logits_masked[0]
+        else:
+            act = dist.sample()
+
+        if remove_recommended_ids:
+            act_unsqueezed = act.unsqueeze(-1)
+            act_ori = indices_masked.gather(dim=1, index=act_unsqueezed).squeeze(1)
+        else:
+            act_ori = act
+
+        return Batch(logits=logits_masked, act=act_ori, state=h, dist=dist)
+
 
     def learn(  # type: ignore
             self, batch: Batch, batch_size: int, repeat: int, **kwargs: Any
