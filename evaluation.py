@@ -7,6 +7,31 @@ import torch
 
 
 
+def test_static_model_in_RL_env(model, env, dataset_val, is_softmax=True, epsilon=0, is_ucb=False, k=1,
+                                need_transform=False, num_trajectory=100, item_feat_domination=None, force_length=10):
+    eval_result_RL = {}
+
+    eval_result_standard = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
+                                                  need_transform, num_trajectory, item_feat_domination,
+                                                  remove_recommended=False, force_length=0)
+
+    # No overlap and end with the env rule
+    eval_result_NX_0 = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
+                                              need_transform, num_trajectory, item_feat_domination,
+                                              remove_recommended=True, force_length=0)
+
+    # No overlap and end with explicit length
+    eval_result_NX_x = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
+                                              need_transform, num_trajectory, item_feat_domination,
+                                              remove_recommended=True, force_length=force_length)
+
+    eval_result_RL.update(eval_result_standard)
+    eval_result_RL.update(eval_result_NX_0)
+    eval_result_RL.update(eval_result_NX_x)
+
+    return eval_result_RL
+
+
 def test_kuaishou(model, env, dataset_val, is_softmax=True, epsilon=0, is_ucb=False):
     cumulative_reward = 0
     total_click_loss = 0

@@ -346,7 +346,7 @@ class UserModel(nn.Module):
 
         eval_result = {}
         for name, metric_fun in self.metric_fun.items():
-            eval_result[name] = metric_fun(y, y_predict)
+            eval_result[name] = float(metric_fun(y, y_predict))
         return eval_result
 
     def predict_data(self, dataset_predict, batch_size=256, verbose=False):

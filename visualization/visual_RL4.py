@@ -17,7 +17,8 @@ from matplotlib.transforms import Bbox
 
 from util.utils import create_dir
 import seaborn as sns
-
+import re
+import pprint
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -93,7 +94,8 @@ def loaddata(dirpath, filenames, args, is_info=False):
 
                     data = json.loads(info2)
                     df_data = pd.DataFrame(data, index=[epoch],dtype=float)
-                    df = df.append(df_data)
+                    # df = df.append(df_data)
+                    df = pd.concat([df, df_data])
                 res_message = re.search(pattern_message, line)
                 if res_message:
                     message = res_message.group(1)
@@ -147,30 +149,61 @@ def axis_shift(ax1 ,x_shift=0.01, y_shift=0):
     ax1.set_position(Bbox(pos_new))
 
 
-
+def compute_improvement(df, col, last=0):
+    our = df.iloc[-5:][col]["CIRS"].mean()
+    prev = df.iloc[-last:][col]["CIRS w_o CI"].mean()
+    print(f"Improvement on [{col}] of last [{last}] count is {(our - prev) / prev}")
 
 def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
     visual_cols = ['R_tra', 'len_tra', 'ctr']
 
 
-    df1 = df1.loc[:100]
-    df2 = df2.loc[:200]
-    df3 = df3.loc[:200]
-    df4 = df4.loc[:1000]
+    df1 = df1.iloc[:100]
+    df2 = df2.iloc[:200]
+    df3 = df3.iloc[:200]
+    df4 = df4.iloc[:1000]
+
+    # compute_improvement(df1, col="R_tra", last=0)
+    # compute_improvement(df2, col="R_tra", last=0)
+    # compute_improvement(df3, col="R_tra", last=0)
+    # compute_improvement(df4, col="R_tra", last=0)
+    #
+    # compute_improvement(df1, col="R_tra", last=10)
+    # compute_improvement(df2, col="R_tra", last=10)
+    # compute_improvement(df3, col="R_tra", last=10)
+    # compute_improvement(df4, col="R_tra", last=10)
+    #
+    # compute_improvement(df1, col="ctr", last=10)
+    # compute_improvement(df2, col="ctr", last=10)
+    # compute_improvement(df3, col="ctr", last=10)
+    # compute_improvement(df4, col="ctr", last=10)
+    #
+    # compute_improvement(df1, col="len_tra", last=10)
+    # compute_improvement(df2, col="len_tra", last=10)
+    # compute_improvement(df3, col="len_tra", last=10)
+    # compute_improvement(df4, col="len_tra", last=10)
 
     dfs = [df1, df2, df3, df4]
     series = "ABCD"
-    dataset = ["VirtualTaobao", "KuaishouEnv", "VirtualTaobao", "KuaishouEnv"]
+    dataset = ["VirtualTaobao", "KuaiEnv", "VirtualTaobao", "KuaiEnv"]
     maxlen = [50, 100, 10, 30]
     fontsize = 11.5
 
     all_method = sorted(set(df1['R_tra'].columns.to_list() + df2['R_tra'].columns.to_list()))
 
-    colors = sns.color_palette(n_colors=len(all_method))
-    markers = ["o", "s", "p", "P", "X", "*", "h", "D", "v", "^", ">", "<"]
+    pattern="\[([KT]_)?(.+)\]"
+    all_method_map = {}
+    for method in all_method:
+        res = re.match("\[([KT]_)?(.+?)(_len.+)?\]", method)
+        if res:
+            all_method_map[method] = res.group(2)
+    pprint.pprint(all_method_map)
 
-    color_kv = dict(zip(all_method, colors))
-    marker_kv = dict(zip(all_method, markers))
+    colors = sns.color_palette(n_colors=len(all_method_map.values()))
+    markers = ["o", "s", "p", "P", "X", "*", "h", "D", "v", "^", ">", "<", "x", "H"]
+
+    color_kv = dict(zip(all_method_map.values(), colors))
+    marker_kv = dict(zip(all_method_map.values(), markers))
 
     fig = plt.figure(figsize=(12, 7))
     # plt.subplots_adjust(wspace=0.3)
@@ -181,12 +214,16 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
         alpha=series[index]
         cnt = 1
         df = dfs[index]
+
+        df.columns()
+
+
         data_r = df[visual_cols[0]]
         data_len = df[visual_cols[1]]
         data_ctr = df[visual_cols[2]]
 
-        color = [color_kv[name] for name in data_r.columns]
-        marker = [marker_kv[name] for name in data_r.columns]
+        color = [color_kv[all_method_map[name]] for name in data_r.columns]
+        marker = [marker_kv[all_method_map[name]] for name in data_r.columns]
 
         ax1 = plt.subplot2grid((3,4), (0,index))
         data_r.plot(kind="line", linewidth=1, ax=ax1, legend=None, color=color, markevery=int(len(data_r)/10), fillstyle='none', alpha=.8, markersize=3)
@@ -195,8 +232,10 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
         plt.yticks(fontsize=10)
         plt.xticks(fontsize=10)
         plt.grid(linestyle='dashdot', linewidth=0.8)
-        ax1.set_title("({}{})".format(alpha, cnt), fontsize=fontsize, y=.97)
-        ax1.set_title("{}".format(dataset[index]), fontsize=fontsize, loc="left", x=0.2, y=1.1, fontweight=700)
+        # ax1.set_title("({}{})".format(alpha, cnt), fontsize=fontsize, y=.97)
+        ax1.set_title("({}{})".format(alpha, cnt), fontsize=fontsize, loc="left", x=0.4, y=.97)
+        ax1.set_title("{}".format(dataset[index]), fontsize=fontsize, y=1.1, fontweight=700)
+        # ax1.set_title("{}".format(dataset[index]), fontsize=fontsize, loc="left", x=0.2, y=1.1, fontweight=700)
         # ax1.set_xlabel("({})".format(series[cnt]), fontsize=fontsize)
         cnt += 1
         # ax1.set_xticklabels(["{:.0%}".format(i) for i in ax1.get_xticks()])
@@ -245,9 +284,9 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
         axs.append((ax1, ax2, ax3))
 
     ax1, ax2, ax3 = axs[0]
-    ax1.set_ylabel("Accumulated reward", fontsize=11, fontweight=700)
-    ax2.set_ylabel("Length", fontsize=11, fontweight=700)
-    ax3.set_ylabel("Reward per round", fontsize=11, fontweight=700)
+    ax1.set_ylabel("Cumulative satisfaction", fontsize=10, fontweight=700)
+    ax2.set_ylabel("Interaction length", fontsize=10, fontweight=700)
+    ax3.set_ylabel("Single-round satisfaction", fontsize=10, fontweight=700)
     ax3.yaxis.set_label_coords(-0.17, 0.5)
 
     ax4 = axs[1][0]
@@ -270,8 +309,8 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
     x, y = np.array([[0.505, 0.505], [0.06, 0.92]])
     line = Line2D(x, y, lw=3, linestyle="dotted", color=(0.5,0.5,0.5))
     axo.add_line(line)
-    plt.text(0.14, 0.02, "(A-B) Results with large interaction rounds", fontsize=11, fontweight=700)
-    plt.text(0.56, 0.02, "(C-D) Results with limited interaction rounds", fontsize=11, fontweight=700)
+    plt.text(0.16, 0.02, "(A-B) Results with large interaction rounds", fontsize=11, fontweight=400)
+    plt.text(0.58, 0.02, "(C-D) Results with limited interaction rounds", fontsize=11, fontweight=400)
     # plt.axis('off')
 
     fig.savefig(os.path.join(save_fig_dir, savename + '.pdf'), format='pdf', bbox_inches='tight')
@@ -291,19 +330,19 @@ def main(args):
     create_dirs = [save_fig_dir]
     create_dir(create_dirs)
 
-    result_dir1 = "./results/taobao 50"
+    result_dir1 = "./results/taobao_len50"
     filenames = walk_paths(result_dir1)
     df1 = loaddata(result_dir1, filenames, args)
 
-    result_dir2 = "./results/kuaishou zo 200"
+    result_dir2 = "./results/kuaishou_len100"
     filenames = walk_paths(result_dir2)
     df2 = loaddata(result_dir2, filenames, args)
 
-    result_dir3 = "./results/taobao 10"
+    result_dir3 = "./results/taobao_len10"
     filenames = walk_paths(result_dir3)
     df3 = loaddata(result_dir3, filenames, args)
 
-    result_dir4 = "./results/kuaishou zo 30"
+    result_dir4 = "./results/kuaishou_len30"
     filenames = walk_paths(result_dir4)
     df4 = loaddata(result_dir4, filenames, args)
 
