@@ -22,6 +22,9 @@ class StaticDataset(Dataset):
         self.df_photo_env['photo_duration'] = np.array(
             list(map(lambda x: photo_mean_duration[x], self.df_photo_env.index)))
 
+        self.df_photo_env.sort_index(inplace=True)
+
+
     def compile_dataset(self, df_x, df_y, score=None):
         self.x_numpy = df_x.to_numpy()
         self.y_numpy = df_y.to_numpy()

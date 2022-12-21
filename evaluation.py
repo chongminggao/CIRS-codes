@@ -54,8 +54,8 @@ def interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb,
             recommended_id_transform, recommended_id_raw, reward_pred = model.recommend_k_item(
                 user, dataset_val, k=k, is_softmax=is_softmax, epsilon=epsilon, is_ucb=is_ucb,
                 recommended_ids=acts if remove_recommended else [])
-            # if need_transform:
-            #     recommendation = env.lbe_photo.transform([recommendation])[0]
+            if need_transform:
+                assert recommended_id_transform == env.lbe_photo.transform([recommended_id_raw])[0]
             acts.append(recommended_id_transform)
             state, reward, done, info = env.step(recommended_id_transform)
             total_turns += 1
@@ -68,9 +68,11 @@ def interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb,
             if done:
                 if force_length > 0:  # do not end here
                     env.cur_user = user_ori[0]
+                    done = False
                 else:
                     break
             if force_length > 0 and len(acts) >= force_length:
+                done = True
                 break
 
         all_acts.extend(acts)
@@ -113,19 +115,19 @@ def test_static_model_in_RL_env(model, env, dataset_val, is_softmax=True, epsilo
                                                   need_transform, num_trajectory, item_feat_domination,
                                                   remove_recommended=False, force_length=0)
 
-    # # No overlap and end with the env rule
-    # eval_result_NX_0 = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
-    #                                           need_transform, num_trajectory, item_feat_domination,
-    #                                           remove_recommended=True, force_length=0)
-    #
-    # # No overlap and end with explicit length
-    # eval_result_NX_x = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
-    #                                           need_transform, num_trajectory, item_feat_domination,
-    #                                           remove_recommended=True, force_length=force_length)
+    # No overlap and end with the env rule
+    eval_result_NX_0 = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
+                                              need_transform, num_trajectory, item_feat_domination,
+                                              remove_recommended=True, force_length=0)
+
+    # No overlap and end with explicit length
+    eval_result_NX_x = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
+                                              need_transform, num_trajectory, item_feat_domination,
+                                              remove_recommended=True, force_length=force_length)
 
     eval_result_RL.update(eval_result_standard)
-    # eval_result_RL.update(eval_result_NX_0)
-    # eval_result_RL.update(eval_result_NX_x)
+    eval_result_RL.update(eval_result_NX_0)
+    eval_result_RL.update(eval_result_NX_x)
 
     return eval_result_RL
 

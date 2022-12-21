@@ -60,6 +60,7 @@ def get_args():
     parser.add_argument('--no_ucb', dest='is_ucb', action='store_false')
     parser.set_defaults(is_ucb=False)
 
+
     parser.add_argument("--num_trajectory", type=int, default=200)
     parser.add_argument("--force_length", type=int, default=10)
 
