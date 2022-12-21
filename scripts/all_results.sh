@@ -20,12 +20,12 @@
 
 # KuaiEnv, Length == 50
 #python CIRS-UserModel-kuaishou.py --cuda 0 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --is_softmax --message "DeepFM+Softmax" &
-python DICE.py                    --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "DICE"  &
+#python DICE.py                    --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "DICE"  &
 #python CIRS-UserModel-kuaishou.py --cuda 2 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 0.9 --not_softmax --message "K_epsilon-greedy" &
-python DeepFM-IPS-pairwise.py     --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "IPS"   &
-python PD-pairwise.py             --cuda 3 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "PD"    &
+#python DeepFM-IPS-pairwise.py     --cuda 1 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "IPS"   &
+#python PD-pairwise.py             --cuda 3 --leave_threshold 0 --num_leave_compute 1 --epoch 200 --message "PD"    &
 #python CIRS-UserModel-kuaishou.py --cuda 0 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200  --epsilon 1.0 --not_softmax --message "K_Random" &
-#python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --not_softmax --is_ucb --message "UCB" &
+python CIRS-UserModel-kuaishou.py --cuda 1 --leave_threshold 0 --num_leave_compute 1 --tau 0 --no_ab --epoch 200 --not_softmax --is_ucb --message "UCB" &
 
 
 # KuaiEnv, Length == 30

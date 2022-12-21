@@ -251,32 +251,111 @@ class UserModel(nn.Module):
         self.n_rec = n_arm
         self.n_each = np.ones(n_arm)
 
-    def recommend_k_item(self, user, dataset_val, k=1, is_softmax=True, epsilon=0, is_ucb=False, recommended_ids=[]):
+    # def recommend_k_item(self, user, dataset_val, k=1, is_softmax=True, epsilon=0, is_ucb=False, recommended_ids=[]):
+    #
+    #     # df_user_val = dataset_val.df_user_val
+    #     df_item_val = dataset_val.df_photo_env
+    #
+    #     item_index = df_item_val.index.to_numpy()
+    #
+    #     # if not lbe_item is None:
+    #     #     recommended_ids = lbe_item.transform(recommended_items).tolist()
+    #     # else:
+    #     #     recommended_ids = recommended_items
+    #
+    #     # the preserved transformed ids.
+    #     indices = np.ones(len(item_index), dtype=bool)
+    #     indices[recommended_ids] = False
+    #     preserved_ids = np.arange(len(item_index))[indices]
+    #
+    #     # the preserved raw ids
+    #     item_index_preserved = item_index[indices]
+    #     df_item_val_preserved = df_item_val.iloc[indices]
+    #
+    #     u_all_item = torch.tensor(
+    #         np.concatenate((np.ones([len(df_item_val_preserved), 1]) * user,
+    #                         # df_user_val.loc[user].to_numpy() * np.array([[1]] * len(df_item_val_preserved)),
+    #                         np.expand_dims(item_index_preserved, axis=-1),
+    #                         df_item_val_preserved.values), 1),
+    #         dtype=torch.float, device=self.device, requires_grad=False)
+    #
+    #     assert u_all_item.shape[1] == len(dataset_val.x_columns)
+    #
+    #     # # 用户的所有评分
+    #     # if df_user is None:
+    #     #     u_all_item = torch.tensor(
+    #     #         np.concatenate((np.ones([len(df_item_val), 1]) * user,
+    #     #                         np.expand_dims(item_index, axis=-1),
+    #     #                         df_item_val.values), 1),
+    #     #         dtype=torch.float, device=self.device, requires_grad=False)
+    #     # else:
+    #     #     u_all_item = torch.tensor(
+    #     #         np.concatenate((np.ones([len(df_item_val), 1]) * user,
+    #     #                         df_user.loc[user].to_numpy() * np.array([[1]] * len(df_item_val)),
+    #     #                         np.expand_dims(item_index, axis=-1),
+    #     #                         df_item_val.values), 1),
+    #     #         dtype=torch.float, device=self.device, requires_grad=False)
+    #
+    #     mean = self.forward(u_all_item)
+    #     u_value = mean.detach().squeeze()  # predicted value
+    #
+    #     if is_ucb and len(recommended_ids) == 0:
+    #         if not hasattr(self, "n_rec"):
+    #             self.compile_UCB(len(u_value))
+    #
+    #         # with warnings.catch_warnings():
+    #         #     warnings.simplefilter("ignore")
+    #         ucb_bound = (2 * np.log(self.n_rec) / self.n_each) ** 0.5
+    #
+    #         # ucb_bound[np.isnan(ucb_bound)] = 0
+    #         # ucb_bound[np.isinf(ucb_bound)] = u_value.max()
+    #
+    #         u_value = u_value + torch.Tensor(ucb_bound).to(u_value.device)
+    #     else:
+    #         u_value = u_value
+    #
+    #     if is_softmax:
+    #         value_softmax = self.softmax(u_value)
+    #         index_rec = torch.multinomial(value_softmax, k, replacement=False)
+    #     else:
+    #         # value = u_value
+    #         # if min(value) < 0:
+    #         #     value = -min(value) + value
+    #         #     value = value / sum(value)
+    #         # Todo:
+    #         # index_rec = u_value.argmax() # 预测分数的max
+    #
+    #         # value = u_value/sum(u_value)
+    #         # index_rec = torch.multinomial(value, k, replacement=False)
+    #
+    #         _, index_rec = torch.topk(u_value, k)
+    #
+    #     if epsilon > 0 and np.random.random() < epsilon:
+    #         # # epsilon-greedy activated!!
+    #         index_rec = torch.randint(0, len(u_value), (k,))
+    #
+    #     recommended_id_transform = preserved_ids[index_rec]
+    #
+    #     if is_ucb:
+    #         self.n_rec += k
+    #         self.n_each[recommended_id_transform] += 1
+    #
+    #     # print(int(index_rec), end=' ')
+    #
+    #     recommended_id_raw = item_index[recommended_id_transform]
+    #     value_rec = u_value.cpu().numpy()[index_rec]
+    #
+    #     return recommended_id_transform, recommended_id_raw, value_rec
 
-        # df_user_val = dataset_val.df_user_val
-        df_item_val = dataset_val.df_photo_env
+    def recommend_k_item(self, user, dataset_val, k=1, is_softmax=True, epsilon=0, is_ucb=False, recommended_ids=[]):  # for kuaishou data
 
-        item_index = df_item_val.index.to_numpy()
-
-        # if not lbe_item is None:
-        #     recommended_ids = lbe_item.transform(recommended_items).tolist()
-        # else:
-        #     recommended_ids = recommended_items
-
-        # the preserved transformed ids.
-        indices = np.ones(len(item_index), dtype=bool)
-        indices[recommended_ids] = False
-        preserved_ids = np.arange(len(item_index))[indices]
-
-        # the preserved raw ids
-        item_index_preserved = item_index[indices]
-        df_item_val_preserved = df_item_val.iloc[indices]
-
+        df_photo_env = dataset_val.df_photo_env  # 小数据集的feature
+        item_index = df_photo_env.index.to_numpy()
+        # 用户的所有评分
         u_all_item = torch.tensor(
-            np.concatenate((np.ones([len(df_item_val_preserved), 1]) * user,
-                            # df_user_val.loc[user].to_numpy() * np.array([[1]] * len(df_item_val_preserved)),
-                            np.expand_dims(item_index_preserved, axis=-1),
-                            df_item_val_preserved.values), 1),
+            np.concatenate((np.ones([len(df_photo_env), 1]) * user,
+                            np.expand_dims(item_index, axis=-1),
+                            df_photo_env.values), 1),
             dtype=torch.float, device=self.device, requires_grad=False)
 
         assert u_all_item.shape[1] == len(dataset_val.x_columns)
@@ -296,10 +375,9 @@ class UserModel(nn.Module):
         #                         df_item_val.values), 1),
         #         dtype=torch.float, device=self.device, requires_grad=False)
 
-        mean = self.forward(u_all_item)
-        u_value = mean.detach().squeeze()  # predicted value
+        u_value = self.forward(u_all_item).detach().squeeze() # predicted value
 
-        if is_ucb and len(recommended_ids) == 0:
+        if is_ucb:
             if not hasattr(self, "n_rec"):
                 self.compile_UCB(len(u_value))
 
@@ -310,42 +388,41 @@ class UserModel(nn.Module):
             # ucb_bound[np.isnan(ucb_bound)] = 0
             # ucb_bound[np.isinf(ucb_bound)] = u_value.max()
 
-            u_value = u_value + torch.Tensor(ucb_bound).to(u_value.device)
+            u_value_ucb = u_value + torch.Tensor(ucb_bound).to(u_value.device)
         else:
-            u_value = u_value
+            u_value_ucb = u_value
+
 
         if is_softmax:
-            value_softmax = self.softmax(u_value)
-            index_rec = torch.multinomial(value_softmax, k, replacement=False)
+            value = self.softmax(u_value_ucb)
+            index = torch.multinomial(value, k, replacement=False)
         else:
             # value = u_value
             # if min(value) < 0:
             #     value = -min(value) + value
             #     value = value / sum(value)
             # Todo:
-            # index_rec = u_value.argmax() # 预测分数的max
+            # index = u_value_ucb.argmax() # 预测分数的max
 
-            # value = u_value/sum(u_value)
-            # index_rec = torch.multinomial(value, k, replacement=False)
+            # value = u_value_ucb/sum(u_value_ucb)
+            # index = torch.multinomial(value, k, replacement=False)
 
-            _, index_rec = torch.topk(u_value, k)
+            _, index = torch.topk(u_value_ucb, k)
 
         if epsilon > 0 and np.random.random() < epsilon:
             # # epsilon-greedy activated!!
-            index_rec = torch.randint(0, len(u_value), (k,))
-
-        recommended_id_transform = preserved_ids[index_rec]
+            index = torch.randint(0, len(item_index), (k,))
 
         if is_ucb:
             self.n_rec += k
-            self.n_each[recommended_id_transform] += 1
+            self.n_each[index] += 1
 
-        # print(int(index_rec), end=' ')
+        # print(int(index), end=' ')
 
-        recommended_id_raw = item_index[recommended_id_transform]
-        value_rec = u_value.cpu().numpy()[index_rec]
+        recommendation = item_index[index]
+        value_rec = u_value.cpu().numpy()[index]
 
-        return recommended_id_transform, recommended_id_raw, value_rec
+        return int(index.cpu().numpy()), recommendation, value_rec
 
     def evaluate_data(self, dataset_val, batch_size=256):
 

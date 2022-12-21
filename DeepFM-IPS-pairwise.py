@@ -249,10 +249,10 @@ sigmoid = nn.Sigmoid()
 def loss_kuaishou_IPS_pairwise(y, y_deepfm_pos, y_deepfm_neg, IPS_score):
     loss_y = (((y_deepfm_pos - y) ** 2) * IPS_score).mean()
 
-    # bpr_click = - (sigmoid(y_deepfm_pos - y_deepfm_neg).log() * IPS_score).mean()
-    # loss = loss_y + bpr_click
+    bpr_click = - (sigmoid(y_deepfm_pos - y_deepfm_neg).log() * IPS_score).mean()
+    loss = loss_y + bpr_click
     
-    loss = loss_y
+    # loss = loss_y
 
     return loss
 

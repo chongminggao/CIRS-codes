@@ -103,6 +103,7 @@ def loaddata(dirpath, filenames, args, is_info=False):
             if args.use_filename == "Yes":
                 message = filename[:-4]
 
+            # print(file.name)
             df.rename(
                 columns={"RL_val_trajectory_reward": "R_tra",
                          "RL_val_trajectory_len": 'len_tra',
@@ -336,19 +337,21 @@ def main(args):
     create_dirs = [save_fig_dir]
     create_dir(create_dirs)
 
-    result_dir1 = "./results/taobao_len50"
+    dirpath = "./results_bak"
+
+    result_dir1 = os.path.join(dirpath, "taobao_len50")
     filenames = walk_paths(result_dir1)
     df1 = loaddata(result_dir1, filenames, args)
 
-    result_dir2 = "./results/kuaishou_len100"
+    result_dir2 = os.path.join(dirpath, "kuaishou_len100")
     filenames = walk_paths(result_dir2)
     df2 = loaddata(result_dir2, filenames, args)
 
-    result_dir3 = "./results/taobao_len10"
+    result_dir3 = os.path.join(dirpath, "taobao_len10")
     filenames = walk_paths(result_dir3)
     df3 = loaddata(result_dir3, filenames, args)
 
-    result_dir4 = "./results/kuaishou_len30"
+    result_dir4 = os.path.join(dirpath, "kuaishou_len30")
     filenames = walk_paths(result_dir4)
     df4 = loaddata(result_dir4, filenames, args)
 
