@@ -87,6 +87,7 @@ def get_args():
     parser.add_argument('--nhead', default=4, type=int)
     # parser.add_argument('--max_len', default=100, type=int)
     parser.add_argument('--force_length', type=int, default=10)
+    parser.add_argument("--top_rate", type=float, default=0.6)
 
     # tianshou
     parser.add_argument('--buffer-size', type=int, default=11000)
