@@ -78,7 +78,7 @@ def get_args():
 def compute_IPS_kuaishouRec(df_x_all, df_big) -> np.ndarray:
     IPS_photo = collections.Counter(df_big['photo_id'])
     IPS_data = df_x_all['photo_id'].map(lambda x: IPS_photo[x])
-    IPS_data[IPS_data == 0] = 1
+    IPS_data[IPS_data < 1] = 1
     IPS_data = 1.0 / IPS_data
     IPS_data_np = IPS_data.to_frame().to_numpy()
 
@@ -249,7 +249,7 @@ sigmoid = nn.Sigmoid()
 def loss_kuaishou_IPS_pairwise(y, y_deepfm_pos, y_deepfm_neg, IPS_score):
     loss_y = (((y_deepfm_pos - y) ** 2) * IPS_score).mean()
 
-    bpr_click = - (sigmoid(y_deepfm_pos - y_deepfm_neg).log() * IPS_score).mean()
+    bpr_click = - (sigmoid(y_deepfm_pos - y_deepfm_neg).log()).mean()
     loss = loss_y + bpr_click
     
     # loss = loss_y

@@ -114,7 +114,7 @@ def get_sorted_domination_features(df_data, df_item, is_multi_hot, yname=None, t
         pos_cat_train = cats_train[cats_train > 0]
 
         sorted_count = collections.Counter(pos_cat_train)
-        sorted_percentile = dict(map(lambda x: (x[0], x[1] / len(df_data)), dict(sorted_count).items()))
+        sorted_percentile = dict(map(lambda x: (x[0], x[1] / sum(sorted_count.values())), dict(sorted_count).items()))
         sorted_items = sorted(sorted_percentile.items(), key=lambda x: x[1], reverse=True)
 
         item_feat_domination["feat"] = sorted_items

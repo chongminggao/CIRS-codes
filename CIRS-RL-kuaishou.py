@@ -75,6 +75,7 @@ def get_args():
     parser.add_argument("--version", type=str, default="v1")
     parser.add_argument('--tau', default=100, type=float)
     parser.add_argument('--gamma_exposure', default=10, type=float)
+    parser.add_argument('--r_decay', default=1, type=float)
 
     parser.add_argument('--leave_threshold', default=0, type=int)
     parser.add_argument('--num_leave_compute', default=1, type=int)
@@ -205,7 +206,8 @@ def main(args):
                 "alpha_u": alpha_u,
                 "beta_i": beta_i,
                 "normed_mat": normed_mat,
-                "gamma_exposure": args.gamma_exposure}
+                "gamma_exposure": args.gamma_exposure,
+                "r_decay": args.r_decay}
     )
 
     simulatedEnv = gym.make("SimulatedEnv-v0")

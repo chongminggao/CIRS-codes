@@ -71,7 +71,7 @@ class LoggerCallback_RL(LoggerCallback_Update):
         result['num_test'] = num_test
         result['len_tra'] = len_tra
         result['R_tra'] = R_tra
-        result['ctr'] = f"{ctr:.3f}"
+        result['ctr'] = f"{ctr:.5f}"
 
         # 1. write logger
         logger.info("Epoch: [{}], Info: [{}]".format(epoch, result))
@@ -115,9 +115,9 @@ class LoggerCallback_Policy():
 
             res = dict()
             res['num_test'] = num_test
-            res[prefix + 'CV'] = f"{results[prefix + 'CV']:.3f}"
-            res[prefix + 'CV_turn'] = f"{results[prefix + 'CV_turn']:.3f}"
-            res[prefix + 'ctr'] = f"{ctr:.3f}"
+            res[prefix + 'CV'] = f"{results[prefix + 'CV']:.5f}"
+            res[prefix + 'CV_turn'] = f"{results[prefix + 'CV_turn']:.5f}"
+            res[prefix + 'ctr'] = f"{ctr:.5f}"
             res[prefix + 'len_tra'] = len_tra
             res[prefix + 'R_tra'] = R_tra
 

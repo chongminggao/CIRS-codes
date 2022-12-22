@@ -7,7 +7,7 @@ import torch
 from tqdm import tqdm
 
 
-def get_feat_dominate_dict(df_item_val, all_acts_origin, item_feat_domination):
+def get_feat_dominate_dict(df_item_val, all_acts_origin, item_feat_domination, topk=0.8):
     if item_feat_domination is None:  # for yahoo
         return dict()
     # if need_transform:
@@ -20,7 +20,21 @@ def get_feat_dominate_dict(df_item_val, all_acts_origin, item_feat_domination):
 
     if "feat" in item_feat_domination:  # for kuairec and kuairand
         sorted_items = item_feat_domination["feat"]
-        dominated_value = sorted_items[0][0]
+        values = np.array([pair[1] for pair in sorted_items])
+        values = values/sum(values)
+        cumsum = values.cumsum()
+        ind = 0
+        for v in cumsum:
+            if v > topk:
+                break
+            ind += 1
+        if ind == 0:
+            ind += 1
+        dominated_values = np.array([pair[0] for pair in sorted_items])
+        dominated_values = dominated_values[:ind]
+
+
+        # dominated_value = sorted_items[0][0]
         recommended_item_features = recommended_item_features.filter(regex="^feat", axis=1)
         feat_flat = recommended_item_features.to_numpy().reshape(-1)
         rate = (feat_flat == dominated_value).sum() / len(recommended_item_features)
@@ -89,8 +103,8 @@ def interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb,
     #                   "trajectory_reward": cumulative_reward / num_trajectory}
     eval_result_RL = {
         "click_loss": click_loss,
-        "CV": f"{CV:.3f}",
-        "CV_turn": f"{CV_turn:.3f}",
+        "CV": f"{CV:.5f}",
+        "CV_turn": f"{CV_turn:.5f}",
         "ctr": ctr,
         "len_tra": total_turns / num_trajectory,
         "R_tra": cumulative_reward / num_trajectory}
@@ -187,8 +201,8 @@ def test_kuaishou(model, env, dataset_val, is_softmax=True, epsilon=0, is_ucb=Fa
 
     eval_result_RL = {
         "click_loss": click_loss,
-        "CV": f"{CV:.3f}",
-        "CV_turn": f"{CV_turn:.3f}",
+        "CV": f"{CV:.5f}",
+        "CV_turn": f"{CV_turn:.5f}",
         "ctr": ctr,
         "len_tra": total_turns / num_trajectory,
         "R_tra": cumulative_reward / num_trajectory}

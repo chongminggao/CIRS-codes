@@ -2,6 +2,7 @@
 # @Time    : 2021/8/2 4:04 下午
 # @Author  : Chongming GAO
 # @FileName: simulated_env.py
+from collections import defaultdict
 
 import gym
 
@@ -19,7 +20,7 @@ class SimulatedEnv(gym.Env):
                  use_exposure_intervention=True,
                  alpha_u=None, beta_i=None,
                  normed_mat=None,
-                 gamma_exposure=1):
+                 gamma_exposure=1, r_decay=1):
         self.user_model = user_model.eval()
 
         self.env_task = gym.make(task_name)
@@ -36,11 +37,9 @@ class SimulatedEnv(gym.Env):
         self.beta_i = beta_i
         self.normed_mat = normed_mat
         self.gamma_exposure = gamma_exposure
+        self.r_decay = r_decay
 
         self._reset_history()
-
-
-
 
     # def compile(self, num_env=1):
     #     self.env_list = DummyVectorEnv([lambda: gym.make(self.env_task) for _ in range(num_env)])
@@ -127,6 +126,11 @@ class SimulatedEnv(gym.Env):
         # 3. Predict click score, i.e, reward
         pred_reward = self._compute_pred_reward(exposure_effect, action)
 
+        if self.env_name == "KuaishouEnv-v0":
+            num_repeat = self.num_actions[action] - 1 # minus itself
+            decay = self.r_decay ** num_repeat
+            pred_reward = pred_reward * decay
+
         self.reward = pred_reward
         self.cum_reward += pred_reward
         self.total_turn = self.env_task.total_turn
@@ -171,6 +175,7 @@ class SimulatedEnv(gym.Env):
         elif self.env_name == "KuaishouEnv-v0":
             self.history_action = np.zeros(self.env_task.max_turn, dtype=np.int)
         self.history_exposure = {}
+        self.num_actions = defaultdict(int)
         self.max_history = 0
 
     def _add_action_to_history(self, t, action, exposure):
@@ -180,6 +185,7 @@ class SimulatedEnv(gym.Env):
             self.history_action[t] = action2
         elif self.env_name == "KuaishouEnv-v0":
             self.history_action[t] = action
+            self.num_actions[action] += 1
 
         self.history_exposure[t] = exposure
 

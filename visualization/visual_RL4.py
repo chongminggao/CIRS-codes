@@ -306,8 +306,11 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
     dict_label = dict(zip(labels1, lines1))
     dict_label.update(dict(zip(labels2, lines2)))
     dict_label = OrderedDict(sorted(dict_label.items(), key=lambda x: x[0]))
-    dict_label = {'CIRS w/o CI' if k=='CIRS w_o CI' else k :v for k,v in dict_label.items()}
-    dict_label = {r'$\epsilon$-greedy' if k == 'Epsilon Greedy' else k: v for k, v in dict_label.items()}
+
+    dict_label = {'CIRS w/o CI' if k=='CIRS w_o CI' or k=='CIRSwoCI' else k :v for k,v in dict_label.items()}
+    dict_label = {r'$\epsilon$-greedy' if k == 'Epsilon Greedy' or k == 'epsilon-greedy' else k: v for k, v in dict_label.items()}
+    dict_label = {r'DeepFM' if k == 'DeepFM+Softmax'else k: v for k, v in dict_label.items()}
+
     ax1.legend(handles=dict_label.values(), labels=dict_label.keys(), ncol=10,
                loc='lower left', columnspacing=0.7,
                bbox_to_anchor=(-0.20, 1.24), fontsize=10.5)
@@ -337,7 +340,7 @@ def main(args):
     create_dirs = [save_fig_dir]
     create_dir(create_dirs)
 
-    dirpath = "./results_bak"
+    dirpath = "./results"
 
     result_dir1 = os.path.join(dirpath, "taobao_len50")
     filenames = walk_paths(result_dir1)
