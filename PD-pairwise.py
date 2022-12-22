@@ -59,6 +59,7 @@ def get_args():
     parser.add_argument("--num_trajectory", type=int, default=200)
     parser.add_argument("--force_length", type=int, default=10)
     parser.add_argument('--epsilon', default=0, type=float)
+    parser.add_argument("--top_rate", type=float, default=0.6)
 
     parser.add_argument('--gamma', default=0.1, type=float)
 
@@ -246,7 +247,7 @@ def main(args):
         functools.partial(test_static_model_in_RL_env, env=env, dataset_val=dataset_val, is_softmax=args.is_softmax,
                           epsilon=args.epsilon, is_ucb=False, need_transform=True,
                           num_trajectory=args.num_trajectory, item_feat_domination=item_feat_domination,
-                          force_length=args.force_length))
+                          force_length=args.force_length, top_rate=args.top_rate))
 
     # %% 5. Learn model
     history = model.fit_data(static_dataset, dataset_val,

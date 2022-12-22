@@ -7,7 +7,7 @@ import torch
 from tqdm import tqdm
 
 
-def get_feat_dominate_dict(df_item_val, all_acts_origin, item_feat_domination, topk=0.8):
+def get_feat_dominate_dict(df_item_val, all_acts_origin, item_feat_domination, top_rate=0.6):
     if item_feat_domination is None:  # for yahoo
         return dict()
     # if need_transform:
@@ -21,11 +21,11 @@ def get_feat_dominate_dict(df_item_val, all_acts_origin, item_feat_domination, t
     if "feat" in item_feat_domination:  # for kuairec and kuairand
         sorted_items = item_feat_domination["feat"]
         values = np.array([pair[1] for pair in sorted_items])
-        values = values/sum(values)
+        values = values / sum(values)
         cumsum = values.cumsum()
         ind = 0
         for v in cumsum:
-            if v > topk:
+            if v > top_rate:
                 break
             ind += 1
         if ind == 0:
@@ -33,22 +33,54 @@ def get_feat_dominate_dict(df_item_val, all_acts_origin, item_feat_domination, t
         dominated_values = np.array([pair[0] for pair in sorted_items])
         dominated_values = dominated_values[:ind]
 
-
         # dominated_value = sorted_items[0][0]
         recommended_item_features = recommended_item_features.filter(regex="^feat", axis=1)
-        feat_flat = recommended_item_features.to_numpy().reshape(-1)
-        rate = (feat_flat == dominated_value).sum() / len(recommended_item_features)
+        feat_numpy = recommended_item_features.to_numpy().astype(int)
+
+        dominate_array = np.zeros([len(feat_numpy)], dtype=bool)
+        for value in dominated_values:
+            equal_mat = (feat_numpy == value)
+            has_dominate = equal_mat.sum(axis=1)
+            dominate_array = dominate_array | has_dominate
+
+        rate = dominate_array.sum() / len(recommended_item_features)
         feat_dominate_dict["ifeat_feat"] = rate
+
     else:  # for coat
         for feat_name, sorted_items in item_feat_domination.items():
-            dominated_value = sorted_items[0][0]
-            rate = (recommended_item_features[feat_name] == dominated_value).sum() / len(recommended_item_features)
+            values = np.array([pair[1] for pair in sorted_items])
+
+            values = values / sum(values)
+            cumsum = values.cumsum()
+            ind = 0
+            for v in cumsum:
+                if v > top_rate:
+                    break
+                ind += 1
+            if ind == 0:
+                ind += 1
+            dominated_values = np.array([pair[0] for pair in sorted_items])
+            dominated_values = dominated_values[:ind]
+
+            # recommended_item_features = recommended_item_features.filter(regex="^feat", axis=1)
+            feat_numpy = recommended_item_features[feat_name].to_numpy().astype(int)
+
+            dominate_array = np.zeros([len(feat_numpy)], dtype=bool)
+            for value in dominated_values:
+                has_dominate = (feat_numpy == value)
+                # has_dominate = equal_mat
+                dominate_array = dominate_array | has_dominate
+
+            rate = dominate_array.sum() / len(recommended_item_features)
+
+            # dominated_value = sorted_items[0][0]
+            # rate = (recommended_item_features[feat_name] == dominated_value).sum() / len(recommended_item_features)
             feat_dominate_dict["ifeat_" + feat_name] = rate
 
     return feat_dominate_dict
 
 def interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k, need_transform,
-                           num_trajectory, item_feat_domination, remove_recommended, force_length=0):
+                           num_trajectory, item_feat_domination, remove_recommended, force_length=0, top_rate=0.6):
     cumulative_reward = 0
     total_click_loss = 0
     total_turns = 0
@@ -113,7 +145,7 @@ def interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb,
         all_acts_origin = env.lbe_photo.inverse_transform(all_acts)
     else:
         all_acts_origin = all_acts
-    feat_dominate_dict = get_feat_dominate_dict(dataset_val.df_photo_env, all_acts_origin, item_feat_domination)
+    feat_dominate_dict = get_feat_dominate_dict(dataset_val.df_photo_env, all_acts_origin, item_feat_domination, top_rate=top_rate)
     eval_result_RL.update(feat_dominate_dict)
 
     if remove_recommended:
@@ -122,22 +154,22 @@ def interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb,
     return eval_result_RL
 
 def test_static_model_in_RL_env(model, env, dataset_val, is_softmax=True, epsilon=0, is_ucb=False, k=1,
-                                need_transform=False, num_trajectory=100, item_feat_domination=None, force_length=10):
+                                need_transform=False, num_trajectory=100, item_feat_domination=None, force_length=10, top_rate=0.6):
     eval_result_RL = {}
 
     eval_result_standard = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
                                                   need_transform, num_trajectory, item_feat_domination,
-                                                  remove_recommended=False, force_length=0)
+                                                  remove_recommended=False, force_length=0, top_rate=top_rate)
 
     # No overlap and end with the env rule
     eval_result_NX_0 = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
                                               need_transform, num_trajectory, item_feat_domination,
-                                              remove_recommended=True, force_length=0)
+                                              remove_recommended=True, force_length=0, top_rate=top_rate)
 
     # No overlap and end with explicit length
     eval_result_NX_x = interactive_evaluation(model, env, dataset_val, is_softmax, epsilon, is_ucb, k,
                                               need_transform, num_trajectory, item_feat_domination,
-                                              remove_recommended=True, force_length=force_length)
+                                              remove_recommended=True, force_length=force_length,top_rate=top_rate)
 
     eval_result_RL.update(eval_result_standard)
     eval_result_RL.update(eval_result_NX_0)
@@ -264,7 +296,7 @@ def test_taobao(model, env, epsilon=0):
 
 
 class Callback_Coverage_Count():
-    def __init__(self, test_collector_set, df_item_val, need_transform, item_feat_domination, lbe_photo):
+    def __init__(self, test_collector_set, df_item_val, need_transform, item_feat_domination, lbe_photo, top_rate):
         self.collector_dict = test_collector_set.collector_dict
         self.num_items = test_collector_set.env.mat[0].shape[1]
 
@@ -273,6 +305,7 @@ class Callback_Coverage_Count():
         self.need_transform = need_transform
         self.item_feat_domination = item_feat_domination
         self.lbe_photo = lbe_photo
+        self.top_rate = top_rate
 
     def on_epoch_begin(self, epoch):
         pass
@@ -310,7 +343,7 @@ class Callback_Coverage_Count():
                 all_acts_origin = self.lbe_photo.inverse_transform(all_acts)
             else:
                 all_acts_origin = all_acts
-            feat_dominate_dict = get_feat_dominate_dict(self.df_item_val, all_acts_origin, self.item_feat_domination)
+            feat_dominate_dict = get_feat_dominate_dict(self.df_item_val, all_acts_origin, self.item_feat_domination, top_rate=self.top_rate)
 
             return feat_dominate_dict
 

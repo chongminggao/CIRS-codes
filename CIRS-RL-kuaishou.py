@@ -346,7 +346,7 @@ def main(args):
 
     policy.callbacks = [
         Callback_Coverage_Count(test_collector_set, df_item_val, need_transform=True, item_feat_domination=item_feat_domination,
-                                lbe_photo=env.lbe_photo),
+                                lbe_photo=env.lbe_photo, top_rate=args.top_rate),
         LoggerCallback_Policy(logger_path, args.force_length)]
 
     # %% 6. Learn the model

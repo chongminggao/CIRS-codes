@@ -57,26 +57,25 @@ python CIRS-UserModel-kuaishou.py --cuda 6 --leave_threshold 0 --num_leave_compu
 
 
 #KuaiEnv, Length == 30
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 0 --tau 10  --seed 0 --r_decay 0  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRSd0_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 1 --tau 0   --seed 0 --r_decay 0  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCId0_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 100 --seed 0 --r_decay 0 --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRSd0_len100" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 3 --tau 0   --seed 0 --r_decay 0 --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCId0_len100" &
-#
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 3 --tau 10  --seed 0 --r_decay 0.1  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRSd1_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 0   --seed 0 --r_decay 0.1  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCId1_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 1 --tau 100 --seed 0 --r_decay 0.1 --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRSd1_len100" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 0 --tau 0   --seed 0 --r_decay 0.1 --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCId1_len100" &
-#
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 0 --tau 10  --seed 0 --r_decay 0.2  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRSd2_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 1 --tau 0   --seed 0 --r_decay 0.2  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCId2_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 100 --seed 0 --r_decay 0.2 --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRSd2_len100" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 3 --tau 0   --seed 0 --r_decay 0.2 --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCId2_len100" &
-#
-#
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 5 --tau 10  --seed 0 --r_decay 0.3  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRSd3_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 7 --tau 0   --seed 0 --r_decay 0.3  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCId3_len30" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 5 --tau 100 --seed 0 --r_decay 0.3 --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRSd3_len100" &
-#python3.9 "CIRS-RL-kuaishou.py"   --cuda 7 --tau 0   --seed 0 --r_decay 0.3 --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCId3_len100" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 0 --tau 10  --seed 0 --r_decay 0  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRSd0_len30" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 1 --tau 0   --seed 0 --r_decay 0  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCId0_len30" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 100 --seed 0 --r_decay 0 --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRSd0_len100" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 3 --tau 0   --seed 0 --r_decay 0 --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCId0_len100" &
+
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 3 --tau 10  --seed 0 --r_decay 0.1  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRSd1_len30" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 0   --seed 0 --r_decay 0.1  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCId1_len30" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 1 --tau 100 --seed 0 --r_decay 0.1 --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRSd1_len100" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 0 --tau 0   --seed 0 --r_decay 0.1 --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCId1_len100" &
+
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 0 --tau 10  --seed 0 --r_decay 0.2  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRSd2_len30" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 1 --tau 0   --seed 0 --r_decay 0.2  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCId2_len30" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 2 --tau 100 --seed 0 --r_decay 0.2 --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRSd2_len100" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 3 --tau 0   --seed 0 --r_decay 0.2 --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCId2_len100" &
+
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 5 --tau 10  --seed 0 --r_decay 0.3  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRSd3_len30" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 7 --tau 0   --seed 0 --r_decay 0.3  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCId3_len30" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 5 --tau 100 --seed 0 --r_decay 0.3 --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --is_ab --epoch 200 --read_message "Pair11"  --message "K_CIRSd3_len100" &
+python3.9 "CIRS-RL-kuaishou.py"   --cuda 7 --tau 0   --seed 0 --r_decay 0.3 --leave_threshold 0  --num_leave_compute 1 --max_turn 100 --no_ab --epoch 200 --read_message "Pair1" --message "K_CIRSwoCId3_len100" &
 #
 #python3.9 "CIRS-RL-kuaishou.py"   --cuda 5 --tau 10  --seed 0 --r_decay 0.4  --gamma_exposure 10  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --is_ab --epoch 1000 --read_message "Pair11" --message "K_CIRSd4_len30" &
 #python3.9 "CIRS-RL-kuaishou.py"   --cuda 7 --tau 0   --seed 0 --r_decay 0.4  --leave_threshold 0  --num_leave_compute 1 --max_turn 30 --no_ab --epoch 1000 --read_message "Pair1" --message "K_CIRSwoCId4_len30" &
