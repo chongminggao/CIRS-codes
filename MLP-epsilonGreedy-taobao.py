@@ -103,7 +103,7 @@ def main(args):
         entry_point='environments.VirtualTaobao.virtualTB.envs:VirtualTB',
         kwargs={"num_leave_compute": args.num_leave_compute,
                 "leave_threshold": args.leave_threshold,
-                "max_turn": args.max_turn + 1}
+                "max_turn": args.max_turn}
     )
 
     env = gym.make('VirtualTB-v0')
@@ -142,7 +142,7 @@ def main(args):
     # %% 5. Learn model
     history = model.fit_data(static_dataset,
                              batch_size=args.batch_size, epochs=args.epoch,
-                             callbacks=[[LoggerCallback_Update(logger_path)]])
+                             callbacks=[LoggerCallback_Update(logger_path)])
     logger.info(history.history)
 
     REMOTE_ROOT = "/root/Counterfactual_IRS"

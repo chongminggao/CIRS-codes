@@ -10,9 +10,9 @@ import torch.nn as nn
 from core.inputs import SparseFeatP
 from deepctr_torch.inputs import build_input_features, DenseFeat, VarLenSparseFeat, get_varlen_pooling_list, \
     create_embedding_matrix, varlen_embedding_lookup
-from deepctr_torch.layers import PredictionLayer, activation_layer
+# from deepctr_torch.layers import PredictionLayer, activation_layer
 # from ..layers.utils import slice_arrays
-from deepctr_torch.callbacks import History
+# from deepctr_torch.callbacks import History
 from torch import Tensor
 
 
@@ -30,8 +30,7 @@ class Linear(nn.Module):
         self.varlen_sparse_feature_columns = list(
             filter(lambda x: isinstance(x, VarLenSparseFeat), feature_columns)) if len(feature_columns) else []
 
-        self.embedding_dict = create_embedding_matrix(feature_columns, init_std, linear=True, sparse=False,
-                                                      device=device, padding_idx=padding_idx)
+        self.embedding_dict = create_embedding_matrix(feature_columns, init_std, linear=True, sparse=False, device=device)
 
         for tensor in self.embedding_dict.values():
             nn.init.normal_(tensor.weight, mean=0, std=init_std)
