@@ -14,24 +14,24 @@ import pandas as pd
 
 from matplotlib import pyplot as plt
 
-from visualization.visual_RL import walk_paths, loaddata
+from visualization.visual_utils import walk_paths, loaddata
 
 DATAPATH = "../environments/KuaishouRec/data"
 
-def parse_args(namespace=None):
-    parser = argparse.ArgumentParser()
-    # --result_dir "./visualization/results/KuaishouEnv-v0"
-    parser.add_argument("--result_dir", type=str, default="./saved_models/VirtualTB-v0/CIRS/logs")
-    parser.add_argument("--use_filename", type=str, default="Yes")
-    # parser.add_argument("--result_dir", type=str, default="../saved_models/PPO_realEnv/logs")
+# def parse_args(namespace=None):
+#     parser = argparse.ArgumentParser()
+#     # --result_dir "./visualization/results/KuaishouEnv-v0"
+#     parser.add_argument("--result_dir", type=str, default="./saved_models/VirtualTB-v0/CIRS/logs")
+#     parser.add_argument("--use_filename", type=str, default="Yes")
+#     # parser.add_argument("--result_dir", type=str, default="../saved_models/PPO_realEnv/logs")
+#
+#     args = parser.parse_known_args(namespace=namespace)[0]
+#     return args
 
-    args = parser.parse_known_args(namespace=namespace)[0]
-    return args
-
-def get_args():
-    namespace = argparse.Namespace()
-    args = parse_args(namespace)
-    return args
+# def get_args():
+#     namespace = argparse.Namespace()
+#     args = parse_args(namespace)
+#     return args
 
 
 def handle_data(df_all, rl_threshold):
@@ -123,18 +123,17 @@ def visual_env(df_kuaishou, df_taobao, save_fig_dir, savename):
     fig.savefig(os.path.join(save_fig_dir, savename + '.pdf'), format='pdf', bbox_inches='tight')
     plt.close(fig)
 
-def main(args):
+def main():
     realpath = os.path.dirname(__file__)
     save_fig_dir = os.path.join(realpath, "figures")
 
-    # rootpath = os.path.join("..", "saved_models", args.env, args.model_name)
-    dir1 = os.path.join(".", "results", "kuaishou leave")
+    dir1 = os.path.join(".", "results_leave", "kuaishou")
     filenames1 = walk_paths(dir1)
-    df1 = loaddata(dir1, filenames1, args)
+    df1 = loaddata(dir1, filenames1)
 
-    dir2 = os.path.join(".", "results", "taobao leave")
+    dir2 = os.path.join(".", "results_leave", "taobao")
     filenames2 = walk_paths(dir2)
-    df2 = loaddata(dir2, filenames2, args)
+    df2 = loaddata(dir2, filenames2)
 
     df_kuaishou = handle_data(df1, rl_threshold=100)
     df_taobao = handle_data(df2, rl_threshold=0)
@@ -143,5 +142,5 @@ def main(args):
 
 
 if __name__ == '__main__':
-    args = get_args()
-    main(args)
+    # args = get_args()
+    main()

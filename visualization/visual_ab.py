@@ -20,19 +20,17 @@ from sklearn.preprocessing import LabelEncoder
 import matplotlib.gridspec as gridspec
 import seaborn as sns
 
-from visualization.seabornfig2grid import SeabornFig2Grid
-
-
 from core.user_model_pairwise import UserModel_Pairwise
 from util.utils import create_dir
 
 DATAPATH = "../environments/KuaishouRec/data"
+
+
 def get_args():
     parser = argparse.ArgumentParser()
-    # --result_dir "./visualization/results/KuaishouEnv-v0"
-    parser.add_argument("--user_model_name", type=str, default="DeepFM-pairwise")
-    parser.add_argument("--env", type=str, default="KuaishouEnv-v0")
-    parser.add_argument("--read_message", type=str, default="visual_ab")
+    parser.add_argument("--visual_path", type=str, default="results_alpha_beta")
+    parser.add_argument("--user_model_name", type=str, default="DeepFM")
+    parser.add_argument("--read_message", type=str, default="Pair11")
     parser.add_argument('--is_ab', dest='is_ab', action='store_true')
     parser.add_argument('--no_ab', dest='is_ab', action='store_false')
     parser.set_defaults(is_ab=True)
@@ -41,23 +39,10 @@ def get_args():
     return args
 
 
-def walk_paths(result_dir):
-    g = os.walk(result_dir)
-
-    files = []
-    for path, dir_list, file_list in g:
-        for file_name in file_list:
-            print(os.path.join(path, file_name))
-            files.append(file_name)
-    return files
-
-
 def loaddata(args):
-
-    USERMODEL_Path = os.path.join("..", "saved_models", args.env, args.user_model_name)
-    model_parameter_path = os.path.join(USERMODEL_Path,
+    model_parameter_path = os.path.join(args.visual_path,
                                         "{}_params_{}.pickle".format(args.user_model_name, args.read_message))
-    model_save_path = os.path.join(USERMODEL_Path, "{}_{}.pt".format(args.user_model_name, args.read_message))
+    model_save_path = os.path.join(args.visual_path, "{}_{}.pt".format(args.user_model_name, args.read_message))
 
     with open(model_parameter_path, "rb") as file:
         model_params = pickle.load(file)
@@ -65,6 +50,9 @@ def loaddata(args):
     model_params["device"] = "cpu"
     user_model = UserModel_Pairwise(**model_params)
     user_model.load_state_dict(torch.load(model_save_path))
+
+    with open(model_parameter_path, "rb") as file:
+        model_params = pickle.load(file)
 
     if hasattr(user_model, 'ab_embedding_dict') and args.is_ab:
         alpha_u = user_model.ab_embedding_dict["alpha_u"].weight.detach().cpu().numpy()
@@ -77,13 +65,10 @@ def loaddata(args):
     filename = os.path.join(DATAPATH, "big_matrix.csv")
     df_big = pd.read_csv(filename, usecols=['user_id', 'photo_id', 'timestamp', 'watch_ratio', 'photo_duration'])
 
-
-
     return alpha_u, beta_i, df_big
 
 
-def visual(alpha_u, beta_i, df_big, save_fig_dir, savename = "alpha_beta"):
-
+def visual(alpha_u, beta_i, df_big, save_fig_dir, savename="alpha_beta"):
     user_cnt = collections.Counter(df_big['user_id'])
     item_cnt = collections.Counter(df_big['photo_id'])
 
@@ -95,7 +80,7 @@ def visual(alpha_u, beta_i, df_big, save_fig_dir, savename = "alpha_beta"):
     # df_big['alpha_u'] = df_big['user_id'].map(lambda x: alpha_u[x])
     # df_big['beta_i'] = df_big['photo_id'].map(lambda x: beta_i[x])
 
-    item_cnt[1225] = 0
+    item_cnt[1225] = 0  # 1225 is missing from the item sets
     user_cnt = OrderedDict(sorted(user_cnt.items(), key=lambda x: x[0]))
     item_cnt = OrderedDict(sorted(item_cnt.items(), key=lambda x: x[0]))
 
@@ -103,7 +88,7 @@ def visual(alpha_u, beta_i, df_big, save_fig_dir, savename = "alpha_beta"):
     df_b = pd.DataFrame({"beta": beta_i.squeeze(), "popularity": item_cnt.values()})
 
     df_a = df_a[df_a["alpha"] < 0.06]
-    df_b = df_b[df_b["beta"] <0.08]
+    df_b = df_b[df_b["beta"] < 0.08]
 
     # sns.jointplot(x=alpha_u.squeeze(), y=np.array(list(user_cnt.values())), kind="kde")
     # g1.savefig(os.path.join(save_fig_dir, savename + '.pdf'), format='pdf')
@@ -115,14 +100,12 @@ def visual(alpha_u, beta_i, df_big, save_fig_dir, savename = "alpha_beta"):
     # https://stackoverflow.com/questions/34706845/change-xticklabels-fontsize-of-seaborn-heatmap
     # https://seaborn.pydata.org/generated/seaborn.set_theme.html#seaborn.set_theme
     sns.set(style="ticks", font_scale=1.5)
-    savename1="alpha_popularity"
+    savename1 = "alpha_popularity"
     g1 = sns.jointplot(data=df_a, x="alpha", y="popularity",
                        marker="x", s=100, space=0, height=5)
     g1.plot_joint(sns.kdeplot, color="r", zorder=1, levels=6)
     # g1.plot_marginals(sns.rugplot, color="r", height=-.15, clip_on=False)
     ax1 = g1.ax_joint.get_xaxis()
-
-
 
     g1.ax_joint.set_xlabel(r'$\alpha_u$ (Sensitivity of Users)', fontsize=22)
     g1.ax_joint.set_ylabel(r'Activity of Users', fontsize=22)
@@ -165,9 +148,8 @@ def visual(alpha_u, beta_i, df_big, save_fig_dir, savename = "alpha_beta"):
     # fig.savefig(os.path.join(save_fig_dir, savename + '.pdf'), format='pdf', bbox_inches='tight')
     # plt.show()
 
+
 def main(args):
-
-
     realpath = os.path.dirname(__file__)
     save_fig_dir = os.path.join(realpath, "figures")
 

@@ -20,28 +20,20 @@ import seaborn as sns
 import re
 import pprint
 
-def get_args():
-    parser = argparse.ArgumentParser()
-    # --result_dir "./visualization/results/KuaishouEnv-v0"
-    parser.add_argument("--result_dir", type=str, default="./saved_models/VirtualTB-v0/CIRS/logs")
-    parser.add_argument("--use_filename", type=str, default="Yes")
-    # parser.add_argument("--result_dir", type=str, default="../saved_models/PPO_realEnv/logs")
-
-    args = parser.parse_known_args()[0]
-    return args
+from visualization.visual_utils import walk_paths
 
 
-def walk_paths(result_dir):
-    g = os.walk(result_dir)
+# def get_args():
+#     parser = argparse.ArgumentParser()
+#     # --result_dir "./visualization/results/KuaishouEnv-v0"
+#     parser.add_argument("--result_dir", type=str, default="./saved_models/VirtualTB-v0/CIRS/logs")
+#     parser.add_argument("--use_filename", type=str, default="Yes")
+#     # parser.add_argument("--result_dir", type=str, default="../saved_models/PPO_realEnv/logs")
+#
+#     args = parser.parse_known_args()[0]
+#     return args
 
-    files = []
-    for path, dir_list, file_list in g:
-        for file_name in file_list:
-            if file_name[0] == '.' or file_name[0] == '_':
-                continue
-            print(os.path.join(path, file_name))
-            files.append(file_name)
-    return files
+
 
 
 def loaddata(dirpath, filenames, args, is_info=False):
@@ -331,8 +323,7 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
 
 
 
-def main(args):
-
+def main():
 
     realpath = os.path.dirname(__file__)
     save_fig_dir = os.path.join(realpath, "figures")
@@ -340,27 +331,27 @@ def main(args):
     create_dirs = [save_fig_dir]
     create_dir(create_dirs)
 
-    dirpath = "./results"
+    dirpath = "./results_all_methods"
 
     result_dir1 = os.path.join(dirpath, "taobao_len50")
     filenames = walk_paths(result_dir1)
-    df1 = loaddata(result_dir1, filenames, args)
+    df1 = loaddata(result_dir1, filenames)
 
     result_dir2 = os.path.join(dirpath, "kuaishou_len100")
     filenames = walk_paths(result_dir2)
-    df2 = loaddata(result_dir2, filenames, args)
+    df2 = loaddata(result_dir2, filenames)
 
     result_dir3 = os.path.join(dirpath, "taobao_len10")
     filenames = walk_paths(result_dir3)
-    df3 = loaddata(result_dir3, filenames, args)
+    df3 = loaddata(result_dir3, filenames)
 
     result_dir4 = os.path.join(dirpath, "kuaishou_len30")
     filenames = walk_paths(result_dir4)
-    df4 = loaddata(result_dir4, filenames, args)
+    df4 = loaddata(result_dir4, filenames)
 
     visual4(df1, df2, df3, df4, save_fig_dir, savename="main_result")
 
 
 if __name__ == '__main__':
-    args = get_args()
-    main(args)
+    # args = get_args()
+    main()

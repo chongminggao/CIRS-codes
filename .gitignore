@@ -17,5 +17,8 @@ visualization/results
 
 *.log
 
+*.pt
+*.pickle
+
 *.egg*
 events.*
