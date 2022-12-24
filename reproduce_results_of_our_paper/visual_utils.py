@@ -3,18 +3,11 @@
 # @Author  : Chongming GAO
 # @FileName: visual_utils.py
 
-
 import os
-import re
 import json
 from collections import OrderedDict
-
-import numpy as np
 import pandas as pd
-
-import seaborn as sns
 import re
-import pprint
 
 
 def walk_paths(result_dir):
@@ -30,24 +23,12 @@ def walk_paths(result_dir):
     return files
 
 
-def organize_df(dfs):
-    ways = set()
-    metrics = set()
-    df = list(dfs.values())[0]
-    for name in df.columns.to_list():
-        re_res = re.match("(NX_(\d*?)_)?(.+)", name)
-        if re_res:
-            ways.add(re_res.group(1) if re_res.group(1) is not None else "FB")
-            metrics.add(re_res.group(3))
-    metrics.remove("num_test")
-
-    # indices = [list(dfs.keys()), df.columns.to_list()]
+def organize_df(dfs, ways, metrics):
     indices = [list(dfs.keys()), ways, metrics]
 
     df_all = pd.DataFrame(columns=pd.MultiIndex.from_product(indices, names=["Exp", "ways", "metrics"]))
 
     for message, df in dfs.items():
-        # print(message, df)
         for way in ways:
             for metric in metrics:
                 col = (way if way != "FB" else "") + metric
@@ -61,6 +42,7 @@ def organize_df(dfs):
 
     # change order of levels
     # https://stackoverflow.com/questions/29859296/how-do-i-change-order-grouping-level-of-pandas-multiindex-columns
+
     df_all.columns = df_all.columns.swaplevel(0, 2)
     df_all.sort_index(axis=1, level=0, inplace=True)
     df_all.columns = df_all.columns.swaplevel(0, 1)
@@ -80,12 +62,7 @@ def organize_df(dfs):
         columns={"CIRSwoCI": 'CIRS w/o CI',
                  "epsilon-greedy": r'$\epsilon$-greedy',
                  "DeepFM+Softmax": 'DeepFM'},
-        level=2,inplace=True)
-
-    # dict_label = {'CIRS w/o CI' if k == 'CIRS w_o CI' or k == 'CIRSwoCI' else k: v for k, v in dict_label.items()}
-    # dict_label = {r'$\epsilon$-greedy' if k == 'Epsilon Greedy' or k == 'epsilon-greedy' else k: v for k, v in
-    #               dict_label.items()}
-    # dict_label = {r'DeepFM' if k == 'DeepFM+Softmax' else k: v for k, v in dict_label.items()}
+        level=2, inplace=True)
 
     return df_all
 
@@ -101,11 +78,9 @@ def loaddata(dirpath, filenames, use_filename=True):
 
     dfs = {}
     infos = {}
-    df = pd.DataFrame()
+
     for filename in filenames:
-        # if filename == ".DS_Store":
-        #     continue
-        if filename[0] == '.' or filename[0] == '_':
+        if filename[0] == '.' or filename[0] == '_':  # ".DS_Store":
             continue
         df = pd.DataFrame()
         message = "None"
@@ -154,6 +129,12 @@ def loaddata(dirpath, filenames, use_filename=True):
                 columns={"RL_val_trajectory_reward": "R_tra",
                          "RL_val_trajectory_len": 'len_tra',
                          "RL_val_CTR": 'ctr'},
+                inplace=True)
+
+            df.rename(
+                columns={"trajectory_reward": "R_tra",
+                         "trajectory_len": 'len_tra',
+                         "CTR": 'ctr'},
                 inplace=True)
 
         dfs[message] = df

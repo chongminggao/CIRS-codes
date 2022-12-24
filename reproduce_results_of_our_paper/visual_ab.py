@@ -7,21 +7,19 @@ import argparse
 import collections
 import os
 import pickle
-import re
-import json
+
 from collections import OrderedDict
 
-import matplotlib
+
 import numpy as np
 import pandas as pd
 import torch
 from matplotlib import pyplot as plt
 from sklearn.preprocessing import LabelEncoder
-import matplotlib.gridspec as gridspec
 import seaborn as sns
 
 from core.user_model_pairwise import UserModel_Pairwise
-from util.utils import create_dir
+
 
 DATAPATH = "../environments/KuaishouRec/data"
 
@@ -39,11 +37,7 @@ def get_args():
     return args
 
 
-def loaddata(args):
-    model_parameter_path = os.path.join(args.visual_path,
-                                        "{}_params_{}.pickle".format(args.user_model_name, args.read_message))
-    model_save_path = os.path.join(args.visual_path, "{}_{}.pt".format(args.user_model_name, args.read_message))
-
+def loaddata(model_parameter_path, model_save_path):
     with open(model_parameter_path, "rb") as file:
         model_params = pickle.load(file)
 
@@ -54,13 +48,13 @@ def loaddata(args):
     with open(model_parameter_path, "rb") as file:
         model_params = pickle.load(file)
 
-    if hasattr(user_model, 'ab_embedding_dict') and args.is_ab:
-        alpha_u = user_model.ab_embedding_dict["alpha_u"].weight.detach().cpu().numpy()
-        beta_i = user_model.ab_embedding_dict["beta_i"].weight.detach().cpu().numpy()
-    else:
-        print("Note there are no available alpha and beta！！")
-        alpha_u = np.ones([7176, 1])
-        beta_i = np.ones([10729, 1])
+    # if hasattr(user_model, 'ab_embedding_dict') and is_ab:
+    alpha_u = user_model.ab_embedding_dict["alpha_u"].weight.detach().cpu().numpy()
+    beta_i = user_model.ab_embedding_dict["beta_i"].weight.detach().cpu().numpy()
+    # else:
+    #     print("Note there are no available alpha and beta！！")
+    #     alpha_u = np.ones([7176, 1])
+    #     beta_i = np.ones([10729, 1])
 
     filename = os.path.join(DATAPATH, "big_matrix.csv")
     df_big = pd.read_csv(filename, usecols=['user_id', 'photo_id', 'timestamp', 'watch_ratio', 'photo_duration'])
@@ -77,9 +71,6 @@ def visual(alpha_u, beta_i, df_big, save_fig_dir, savename="alpha_beta"):
     lbe_item = LabelEncoder()
     lbe_item.fit(np.array(list(item_cnt.keys())))
 
-    # df_big['alpha_u'] = df_big['user_id'].map(lambda x: alpha_u[x])
-    # df_big['beta_i'] = df_big['photo_id'].map(lambda x: beta_i[x])
-
     item_cnt[1225] = 0  # 1225 is missing from the item sets
     user_cnt = OrderedDict(sorted(user_cnt.items(), key=lambda x: x[0]))
     item_cnt = OrderedDict(sorted(item_cnt.items(), key=lambda x: x[0]))
@@ -92,9 +83,7 @@ def visual(alpha_u, beta_i, df_big, save_fig_dir, savename="alpha_beta"):
 
     # sns.jointplot(x=alpha_u.squeeze(), y=np.array(list(user_cnt.values())), kind="kde")
     # g1.savefig(os.path.join(save_fig_dir, savename + '.pdf'), format='pdf')
-
     # plt.scatter(alpha_u, user_cnt.values())
-
     # plt.scatter(beta_i, item_cnt.values())
 
     # https://stackoverflow.com/questions/34706845/change-xticklabels-fontsize-of-seaborn-heatmap
@@ -121,47 +110,25 @@ def visual(alpha_u, beta_i, df_big, save_fig_dir, savename="alpha_beta"):
     g2.savefig(os.path.join(save_fig_dir, savename2 + '.pdf'), format='pdf')
     plt.close()
 
-    a = 1
-    # fig = plt.figure(figsize=(6, 3.3))
-    #
-    # gs = gridspec.GridSpec(1, 2)
-    #
-    # sns.set_style("ticks")
-    # ax1 = fig.add_subplot(gs[0, 0])
-    # g1 = sns.jointplot(data=df_a, x="alpha", y="popularity",ax=ax1)
-    # ax2 = fig.add_subplot(gs[0, 1])
-    # g2 = sns.jointplot(data=df_b, x="beta", y="popularity")
-    #
-    # mg0 = SeabornFig2Grid(g1, fig, gs[0])
-    # mg1 = SeabornFig2Grid(g2, fig, gs[1])
-    #
-    # gs.tight_layout(fig)
-    #
-    #
-    # # ax1.set_xlabel(r'$\alpha_u$', fontsize=12)
-    # # ax1.set_ylabel(r'Popularity', fontsize=12)
-    # # ax2.set_xlabel(r'$\beta_i$', fontsize=12)
-    # # ax2.set_ylabel(r'Popularity', fontsize=12)
-    #
-    # # fig.savefig(os.path.join(save_fig_dir, savename + '.pdf'), format='pdf')
-    #
-    # fig.savefig(os.path.join(save_fig_dir, savename + '.pdf'), format='pdf', bbox_inches='tight')
-    # plt.show()
 
 
-def main(args):
+def visual_alpha_beta(visual_path, user_model_name, read_message):
     realpath = os.path.dirname(__file__)
     save_fig_dir = os.path.join(realpath, "figures")
 
-    # create_dirs = [save_fig_dir]
-    # create_dir(create_dirs)
+    model_parameter_path = os.path.join(visual_path,
+                                        "{}_params_{}.pickle".format(user_model_name, read_message))
+    model_save_path = os.path.join(visual_path, "{}_{}.pt".format(user_model_name, read_message))
 
-    # filenames = walk_paths(result_dir)
-    alpha_u, beta_i, df_big = loaddata(args)
+    alpha_u, beta_i, df_big = loaddata(model_parameter_path, model_save_path)
 
     visual(alpha_u, beta_i, df_big, save_fig_dir)
 
 
 if __name__ == '__main__':
-    args = get_args()
-    main(args)
+
+    visual_path = "results_alpha_beta"
+    user_model_name = "DeepFM"
+    read_message = "Pair11"
+
+    visual_alpha_beta(visual_path, user_model_name, read_message)

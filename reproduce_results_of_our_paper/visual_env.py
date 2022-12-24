@@ -2,7 +2,6 @@
 # @Author  : Chongming GAO
 # @FileName: visual_env.py
 
-import argparse
 
 import os
 
@@ -14,59 +13,46 @@ import pandas as pd
 
 from matplotlib import pyplot as plt
 
-from visualization.visual_utils import walk_paths, loaddata
+from visualization.visual_utils import walk_paths, loaddata, organize_df
 
 DATAPATH = "../environments/KuaishouRec/data"
 
-# def parse_args(namespace=None):
-#     parser = argparse.ArgumentParser()
-#     # --result_dir "./visualization/results/KuaishouEnv-v0"
-#     parser.add_argument("--result_dir", type=str, default="./saved_models/VirtualTB-v0/CIRS/logs")
-#     parser.add_argument("--use_filename", type=str, default="Yes")
-#     # parser.add_argument("--result_dir", type=str, default="../saved_models/PPO_realEnv/logs")
-#
-#     args = parser.parse_known_args(namespace=namespace)[0]
-#     return args
 
-# def get_args():
-#     namespace = argparse.Namespace()
-#     args = parse_args(namespace)
-#     return args
-
-
-def handle_data(df_all, rl_threshold):
-    visual_cols = ['R_tra', 'len_tra', 'ctr']
-    data_r = df_all[visual_cols[0]]
-    data_len = df_all[visual_cols[1]]
-    data_ctr = df_all[visual_cols[2]]
-
-    # data = data_r.dropna()
-
-    length = data_r.sum() / data_r.mean()
+def handle_data(df_all):
+    data_r = df_all["R_tra"]
     meandata = data_r.mean()
-    meandata.update(data_r.loc[:, length > rl_threshold][rl_threshold:].mean())
 
-    pattern_name = re.compile("\[(.*)[-\s]leave[=]?(\d).*]_.*")
+    pattern_name = re.compile("(.*)[-\s]leave[=]?(\d)")
 
     df1 = pd.DataFrame()
-
     for k, v in meandata.iteritems():
+        print(k)
         res = re.search(pattern_name, k)
         method = res.group(1)
         leave = res.group(2)
         df1.loc[leave, method] = v
 
     # df = df.columns[2:]
-    def mysub(name):
-        return re.sub(r'\sw[:_]o\s', ' w/o ', name, flags=re.IGNORECASE)
-
-    df1.columns = list(map(mysub, df1.columns))
+    # def mysub(name):
+    #     return re.sub(r'\sw[:_]o\s', ' w/o ', name, flags=re.IGNORECASE)
+    #
+    # df1.columns = list(map(mysub, df1.columns))
     df1 = df1[sorted(df1.columns)]
 
     return df1
 
 
+
 def visual_env(df_kuaishou, df_taobao, save_fig_dir, savename):
+    # ways_kuaishou = df_kuaishou.columns.levels[0]
+    # metrics_kuaishou = df_kuaishou.columns.levels[1]
+    # methods_kuaishou = df_kuaishou.columns.levels[1]
+
+    # ways_taobao = df_taobao.columns.levels[0]
+    # metrics_taobao = df_taobao.columns.levels[1]
+    # methods_taobao = df_taobao.columns.levels[1]
+
+
 
     all_method = sorted(set(df_kuaishou.columns.to_list() + df_taobao.columns.to_list()))
     color = sns.color_palette(n_colors=len(all_method))
@@ -135,10 +121,25 @@ def main():
     filenames2 = walk_paths(dir2)
     df2 = loaddata(dir2, filenames2)
 
-    df_kuaishou = handle_data(df1, rl_threshold=100)
-    df_taobao = handle_data(df2, rl_threshold=0)
+    # df_kuaishou = handle_data(df1, rl_threshold=100)
+    # df_taobao = handle_data(df2, rl_threshold=0)
 
-    visual_env(df_kuaishou, df_taobao, save_fig_dir, savename="leave")
+    ways={'FB', 'NX_0_', 'NX_10_'}
+    metrics={'ctr', 'len_tra', 'R_tra',  'CV', 'CV_turn', 'ifeat_feat'}
+    df_kuaishou = organize_df(df1, ways, metrics)
+
+    ways = {'FB'}
+    metrics = {'ctr', 'len_tra', 'R_tra'}
+    df_taobao = organize_df(df2, ways, metrics)
+
+
+    df_ks = df_kuaishou['FB']
+    df_tb = df_taobao['FB']
+
+    df_ks = handle_data(df_ks)
+    df_tb = handle_data(df_tb)
+
+    visual_env(df_ks, df_tb, save_fig_dir, savename="leave")
 
 
 if __name__ == '__main__':

@@ -285,11 +285,10 @@ def test_taobao(model, env, epsilon=0):
     click_loss = total_click_loss / total_turns
 
     # print('CTR: %.2f'.format(ctr))
-    eval_result_RL = {"CTR": ctr,
+    eval_result_RL = {"ctr": ctr,
                       "click_loss": click_loss,
-                      "trajectory_len":total_turns/num_trajectory,
-                      "trajectory_reward": cumulative_reward/num_trajectory} #/10}
-
+                      "len_tra":total_turns/num_trajectory,
+                      "R_tra": cumulative_reward/num_trajectory} #/10}
 
     return eval_result_RL
 
