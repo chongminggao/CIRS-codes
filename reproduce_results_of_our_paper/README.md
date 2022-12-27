@@ -1,4 +1,4 @@
-## A guide to produce the main results of the paper.
+## A guide to reproduce the main results of the paper.
 
 There are three steps to reproduce the results.
 1. Run the scripts to run the experiments to produce the log files.
@@ -116,11 +116,9 @@ CIRS-codes
 
 We have already prepared those logs in this repository. So you can directly visualize the results.
 
-We illustrate the results via the Jupyter Notebook file: `visualize_main_results.ipynb`.
+We illustrate the results via the Jupyter Notebook file: [visualize_main_results.ipynb](./visualize_main_results.ipynb).
 
-The output is illustrated in [this HTML](#).
-
-Or you can try it yourself at Google Colab.
+The output is illustrated in [this HTML](./visualize_main_results.html).
 
 
 

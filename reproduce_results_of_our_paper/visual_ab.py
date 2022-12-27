@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/9/13 10:25 上午
-# @Author  : Chongming GAO
-# @FileName: visual_RL.py
 
 import argparse
-import collections
+import json
 import os
 
 from collections import OrderedDict
@@ -41,10 +38,7 @@ def loaddata_ab(model_save_path):
     return alpha_u, beta_i
 
 
-def visual_ab(alpha_u, beta_i, df_big, save_fig_dir):
-    user_cnt = collections.Counter(df_big['user_id'])
-    item_cnt = collections.Counter(df_big['photo_id'])
-
+def visual_ab(alpha_u, beta_i, user_cnt, item_cnt, save_fig_dir):
     lbe_user = LabelEncoder()
     lbe_user.fit(np.array(list(user_cnt.keys())))
     lbe_item = LabelEncoder()
@@ -102,10 +96,20 @@ def visual_alpha_beta(visual_path, user_model_name, read_message):
 
     alpha_u, beta_i = loaddata_ab(model_save_path)
 
-    bigmatrix_filename = os.path.join(DATAPATH, "big_matrix.csv")
-    df_big = pd.read_csv(bigmatrix_filename, usecols=['user_id', 'photo_id'])
+    with open('user_cnt_train.json', 'r') as openfile:
+        user_cnt = json.load(openfile)
+    with open('item_cnt_train.json', 'r') as openfile:
+        item_cnt = json.load(openfile)
+    user_cnt = {int(k): int(v) for k, v in user_cnt.items()}
+    item_cnt = {int(k): int(v) for k, v in item_cnt.items()}
 
-    visual_ab(alpha_u, beta_i, df_big, save_fig_dir)
+    ## The original way to get user_cnt and item_cnt.
+    # bigmatrix_filename = os.path.join(DATAPATH, "big_matrix.csv")
+    # df_big = pd.read_csv(bigmatrix_filename, usecols=['user_id', 'photo_id'])
+    # user_cnt = dict(collections.Counter(df_big['user_id']))
+    # item_cnt = dict(collections.Counter(df_big['photo_id']))
+
+    visual_ab(alpha_u, beta_i, user_cnt, item_cnt, save_fig_dir)
 
 
 if __name__ == '__main__':

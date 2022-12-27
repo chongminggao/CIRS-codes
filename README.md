@@ -145,6 +145,12 @@ The following commands only give one argument `--cuda 0` as an example. For more
     ```
 
 ---
+## A guide to reproduce the main results of the paper.
+
+You can follow the guide to reproduce the main results of our paper, see [this link](./reproduce_results_of_our_paper).
+
+
+
 ## Main Contributors
 
 <table border="0">

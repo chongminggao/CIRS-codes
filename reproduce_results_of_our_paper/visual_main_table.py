@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/9/13 10:25 上午
-# @Author  : Chongming GAO
-# @FileName: visual_RL.py
 
 
 import os
@@ -24,10 +21,12 @@ def axis_shift(ax1, x_shift=0.01, y_shift=0):
     pos_new[:, 1] += y_shift
     ax1.set_position(Bbox(pos_new))
 
+
 def compute_improvement(df, col, last=0):
     our = df.iloc[-5:][col]["CIRS"].mean()
     prev = df.iloc[-last:][col]["CIRS w_o CI"].mean()
     print(f"Improvement on [{col}] of last [{last}] count is {(our - prev) / prev}")
+
 
 def draw(df_metric, ax1, color, marker, name):
     df_metric.plot(kind="line", linewidth=1, ax=ax1, legend=None, color=color, markevery=int(len(df_metric) / 10),
@@ -39,6 +38,7 @@ def draw(df_metric, ax1, color, marker, name):
     plt.xticks(fontsize=10)
     plt.grid(linestyle='dashdot', linewidth=0.8)
     ax1.set_ylabel(name, fontsize=10, fontweight=700)
+
 
 def visual(df_all, save_fig_dir, savename="three"):
     df_all.rename(columns={r"$\text{CV}_\text{M}$": r"CV_M"}, level=1,
@@ -97,13 +97,12 @@ def get_top2_methods(col, is_largest):
     name1, name2 = top2_name[0], top2_name[1]
     return name1, name2
 
+
 def handle_one_col(df_metric, final_rate, is_largest):
     length = len(df_metric)
-    res_start = int((1-final_rate) * length)
+    res_start = int((1 - final_rate) * length)
     mean = df_metric[res_start:].mean()
     std = df_metric[res_start:].std()
-
-
 
     # mean.nlargest(2).index[1]
     res_latex = pd.Series(map(lambda mean, std: f"${mean:.3f}\pm {std:.3f}$", mean, std),
@@ -117,9 +116,12 @@ def handle_one_col(df_metric, final_rate, is_largest):
 
     return res_latex, res_excel
 
+
 def handle_table(df_all, save_fig_dir, savename="all_results", final_rate=1):
-    df_all.rename(columns={"FB": "Standard", "NX_0_": r"No Overlapping", "NX_10_": r"No Overlapping for 10 turns"}, level=0, inplace=True)
-    df_all.rename(columns={"ifeat_feat": "MCD", "CV_turn": r"$\text{CV}_\text{M}$", "len_tra":"Length"}, level=1, inplace=True)
+    df_all.rename(columns={"FB": "Standard", "NX_0_": r"No Overlapping", "NX_10_": r"No Overlapping for 10 turns"},
+                  level=0, inplace=True)
+    df_all.rename(columns={"ifeat_feat": "MCD", "CV_turn": r"$\text{CV}_\text{M}$", "len_tra": "Length"}, level=1,
+                  inplace=True)
 
     ways = df_all.columns.levels[0][::-1]
     metrics = df_all.columns.levels[1]
@@ -129,11 +131,8 @@ def handle_table(df_all, save_fig_dir, savename="all_results", final_rate=1):
     methods = methods + ["CIRS", "CIRS w/o CI"]
     methods_order = dict(zip(methods, list(range(len(methods)))))
 
-
     df_latex = pd.DataFrame(columns=pd.MultiIndex.from_product([ways, metrics], names=["ways", "metrics"]))
     df_excel = pd.DataFrame(columns=pd.MultiIndex.from_product([ways, metrics], names=["ways", "metrics"]))
-
-
 
     for col, way in enumerate(ways):
         df = df_all[way]
@@ -142,13 +141,13 @@ def handle_table(df_all, save_fig_dir, savename="all_results", final_rate=1):
             is_largest = False if metric == "MCD" else True
             df_latex[way, metric], df_excel[way, metric] = handle_one_col(df_metric, final_rate, is_largest=is_largest)
 
-
-    df_latex.sort_index(key=lambda index:[methods_order[x] for x in index.to_list()], inplace=True)
+    df_latex.sort_index(key=lambda index: [methods_order[x] for x in index.to_list()], inplace=True)
     df_excel.sort_index(key=lambda index: [methods_order[x] for x in index.to_list()], inplace=True)
 
     # print(df_latex.to_markdown())
-    excel_path = os.path.join(save_fig_dir, savename + '.xlsx')
-    df_excel.to_excel(excel_path)
+    # excel_path = os.path.join(save_fig_dir, savename + '.xlsx')
+    # df_excel.to_excel(excel_path)
+
     return df_latex, df_excel
 
 
@@ -167,9 +166,16 @@ def visual_one_group():
     metrics = {'len_tra', 'CV', 'CV_turn', 'ifeat_feat'}
     df_all = organize_df(dfs, ways, metrics)
 
-    df_latex, df_excel = handle_table(df_all, save_fig_dir, savename="all_results")
-    print(df_latex.to_latex(escape=False))
-    # visual(df_all, save_fig_dir, savename="all_results")
+    print("Producing the table...")
+    savename = "all_results"
+    df_latex, df_excel = handle_table(df_all, save_fig_dir, savename=savename)
+
+    # display(df_excel)
+    display(HTML(df_excel.to_html()))
+
+    # please install openpyxl if you want to write to an excel file.
+    # excel_path = os.path.join(save_fig_dir, savename + '.xlsx')
+    # df_excel.to_excel(excel_path)
 
 
 if __name__ == '__main__':

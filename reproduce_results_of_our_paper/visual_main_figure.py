@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/9/13 10:25 上午
-# @Author  : Chongming GAO
-# @FileName: visual_RL.py
+
 
 
 import os
