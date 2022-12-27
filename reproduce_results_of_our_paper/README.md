@@ -118,7 +118,151 @@ We have already prepared those logs in this repository. So you can directly visu
 
 We illustrate the results via the Jupyter Notebook file: [visualize_main_results.ipynb](./visualize_main_results.ipynb).
 
-The output is illustrated in [this HTML](./visualize_main_results.html).
+All generated figures and tables are saved under [figures](figures).
 
+##### - Main results:
 
+![main figure](figures/main_result.pdf)
 
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output " data-mime-type="text/html">
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>ways</th>
+      <th colspan="4" halign="left">Standard</th>
+      <th colspan="4" halign="left">No Overlapping</th>
+    </tr>
+    <tr>
+      <th>metrics</th>
+      <th><span class="MathJax_Preview" style="color: inherit;"></span><span id="MathJax-Element-1-Frame" class="mjx-chtml MathJax_CHTML" tabindex="0" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msub><mtext>CV</mtext><mtext>M</mtext></msub></math>" role="presentation" style="font-size: 119%; position: relative;"><span id="MJXc-Node-1" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-2" class="mjx-mrow"><span id="MJXc-Node-3" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-4" class="mjx-mtext"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.424em; padding-bottom: 0.354em;">CV</span></span></span><span class="mjx-sub" style="font-size: 70.7%; vertical-align: -0.212em; padding-right: 0.071em;"><span id="MJXc-Node-5" class="mjx-mtext" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.424em; padding-bottom: 0.354em;">M</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mtext>CV</mtext><mtext>M</mtext></msub></math></span></span><script type="math/tex" id="MathJax-Element-1">\text{CV}_\text{M}</script></th>
+      <th>CV</th>
+      <th>Length</th>
+      <th>MCD</th>
+      <th><span class="MathJax_Preview" style="color: inherit;"></span><span id="MathJax-Element-2-Frame" class="mjx-chtml MathJax_CHTML" tabindex="0" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><msub><mtext>CV</mtext><mtext>M</mtext></msub></math>" role="presentation" style="font-size: 119%; position: relative;"><span id="MJXc-Node-6" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-7" class="mjx-mrow"><span id="MJXc-Node-8" class="mjx-msubsup"><span class="mjx-base"><span id="MJXc-Node-9" class="mjx-mtext"><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.424em; padding-bottom: 0.354em;">CV</span></span></span><span class="mjx-sub" style="font-size: 70.7%; vertical-align: -0.212em; padding-right: 0.071em;"><span id="MJXc-Node-10" class="mjx-mtext" style=""><span class="mjx-char MJXc-TeX-main-R" style="padding-top: 0.424em; padding-bottom: 0.354em;">M</span></span></span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mtext>CV</mtext><mtext>M</mtext></msub></math></span></span><script type="math/tex" id="MathJax-Element-2">\text{CV}_\text{M}</script></th>
+      <th>CV</th>
+      <th>Length</th>
+      <th>MCD</th>
+    </tr>
+    <tr>
+      <th>Exp</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th><span class="MathJax_Preview" style="color: inherit;"></span><span id="MathJax-Element-3-Frame" class="mjx-chtml MathJax_CHTML" tabindex="0" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi>&amp;#x03F5;</mi></math>" role="presentation" style="font-size: 119%; position: relative;"><span id="MJXc-Node-11" class="mjx-math" aria-hidden="true"><span id="MJXc-Node-12" class="mjx-mrow"><span id="MJXc-Node-13" class="mjx-mi"><span class="mjx-char MJXc-TeX-math-I" style="padding-top: 0.214em; padding-bottom: 0.284em;">ϵ</span></span></span></span><span class="MJX_Assistive_MathML" role="presentation"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>ϵ</mi></math></span></span><script type="math/tex" id="MathJax-Element-3">\epsilon</script>-greedy</th>
+      <td>0.102+0.013</td>
+      <td>0.014+0.002</td>
+      <td>2.319+0.053</td>
+      <td>0.981+0.006</td>
+      <td>0.101+0.004</td>
+      <td>0.108+0.005</td>
+      <td>17.758+0.386</td>
+      <td>0.782+0.002</td>
+    </tr>
+    <tr>
+      <th>DICE</th>
+      <td>0.013+0.001</td>
+      <td>0.004+0.000</td>
+      <td>5.580+0.301</td>
+      <td>0.784+0.013</td>
+      <td>0.018+0.001</td>
+      <td>0.010+0.001</td>
+      <td>9.724+0.514</td>
+      <td>0.791+0.005</td>
+    </tr>
+    <tr>
+      <th>DeepFM</th>
+      <td>0.013+0.001</td>
+      <td>0.004+0.000</td>
+      <td>5.603+0.285</td>
+      <td>0.783+0.013</td>
+      <td>0.018+0.001</td>
+      <td>0.010+0.001</td>
+      <td>9.690+0.478</td>
+      <td>0.790+0.004</td>
+    </tr>
+    <tr>
+      <th>IPS</th>
+      <td>0.411+0.113</td>
+      <td>0.174+0.044</td>
+      <td>7.064+0.585</td>
+      <td>0.846+0.018</td>
+      <td>0.415+0.111</td>
+      <td>0.179+0.042</td>
+      <td>7.337+0.763</td>
+      <td>0.849+0.016</td>
+    </tr>
+    <tr>
+      <th>PD</th>
+      <td>0.012+0.001</td>
+      <td>0.003+0.000</td>
+      <td>4.833+0.242</td>
+      <td>0.805+0.012</td>
+      <td>0.014+0.001</td>
+      <td>0.009+0.000</td>
+      <td>10.842+0.534</td>
+      <td>0.794+0.003</td>
+    </tr>
+    <tr>
+      <th>Random</th>
+      <td>0.802+0.013</td>
+      <td>0.368+0.016</td>
+      <td>7.646+0.422</td>
+      <td>0.800+0.010</td>
+      <td>0.802+0.015</td>
+      <td>0.369+0.018</td>
+      <td>7.658+0.475</td>
+      <td>0.798+0.011</td>
+    </tr>
+    <tr>
+      <th>UCB</th>
+      <td>0.003+0.000</td>
+      <td>0.000+0.000</td>
+      <td>2.082+0.653</td>
+      <td>1.000+0.000</td>
+      <td>0.005+0.000</td>
+      <td>0.005+0.000</td>
+      <td>18.000+0.000</td>
+      <td>0.778+0.000</td>
+    </tr>
+    <tr>
+      <th>CIRS</th>
+      <td>0.085+0.127</td>
+      <td>0.068+0.062</td>
+      <td>61.508+34.175</td>
+      <td>0.392+0.072</td>
+      <td>0.109+0.122</td>
+      <td>0.100+0.059</td>
+      <td>41.091+11.046</td>
+      <td>0.401+0.049</td>
+    </tr>
+    <tr>
+      <th>CIRS w/o CI</th>
+      <td>0.078+0.137</td>
+      <td>0.060+0.075</td>
+      <td>70.930+34.681</td>
+      <td>0.443+0.090</td>
+      <td>0.108+0.127</td>
+      <td>0.100+0.064</td>
+      <td>40.386+9.175</td>
+      <td>0.426+0.042</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+##### - Results for study on parameters $\alpha$ and $\beta$.
+
+| <img src="figures/alpha_popularity.pdf" alt="main figure" style="zoom: 67%;" /> | <img src="figures/beta_popularity.pdf" alt="main figure" style="zoom:67%;" /> |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+
+##### - Results for study on different leave conditions on two datasets.
+
+![main figure](figures/leave.pdf)

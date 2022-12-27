@@ -171,7 +171,7 @@ def visual_one_group():
     df_latex, df_excel = handle_table(df_all, save_fig_dir, savename=savename)
 
     # display(df_excel)
-    display(HTML(df_excel.to_html()))
+    # display(HTML(df_excel.to_html()))
 
     # please install openpyxl if you want to write to an excel file.
     # excel_path = os.path.join(save_fig_dir, savename + '.xlsx')
