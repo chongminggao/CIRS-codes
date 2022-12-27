@@ -1,0 +1,147 @@
+[I 221217 07:01:33 CIRS-RL-taobao:134] {
+      "env": "VirtualTB-v0",
+      "user_model_name": "MLP",
+      "model_name": "CIRS",
+      "seed": 2022,
+      "cuda": 0,
+      "cpu": false,
+      "is_save": false,
+      "version": "v1",
+      "tau": 0.0,
+      "gamma_exposure": 10,
+      "leave_threshold": 3.0,
+      "num_leave_compute": 5,
+      "max_turn": 50,
+      "dim_state": 20,
+      "dim_model": 27,
+      "nhead": 3,
+      "buffer_size": 11000,
+      "lr": 0.001,
+      "gamma": 0.95,
+      "epoch": 100,
+      "step_per_epoch": 15000,
+      "repeat_per_collect": 2,
+      "batch_size": 2048,
+      "hidden_sizes": [
+        64,
+        64
+      ],
+      "episode_per_collect": 100,
+      "training_num": 100,
+      "test_num": 100,
+      "render": 0.0,
+      "vf_coef": 0.25,
+      "ent_coef": 0.0,
+      "eps_clip": 0.2,
+      "max_grad_norm": 0.5,
+      "gae_lambda": 0.95,
+      "rew_norm": 1,
+      "dual_clip": null,
+      "value_clip": 1,
+      "norm_adv": 1,
+      "recompute_adv": 0,
+      "resume": false,
+      "save_interval": 1000,
+      "read_message": "taobao tau 0",
+      "message": "T_CIRSwoCI_len50"
+    }
+[I 221217 07:59:33 utils:67] Epoch: [1], Info: [{'num_test': 100, 'len_tra': 49.32, 'R_tra': 8.57, 'ctr': '0.174'}]
+[I 221217 08:42:43 utils:67] Epoch: [2], Info: [{'num_test': 100, 'len_tra': 49.67, 'R_tra': 11.43, 'ctr': '0.230'}]
+[I 221217 09:26:25 utils:67] Epoch: [3], Info: [{'num_test': 100, 'len_tra': 47.98, 'R_tra': 13.4, 'ctr': '0.279'}]
+[I 221217 10:09:58 utils:67] Epoch: [4], Info: [{'num_test': 100, 'len_tra': 49.01, 'R_tra': 16.66, 'ctr': '0.340'}]
+[I 221217 10:52:38 utils:67] Epoch: [5], Info: [{'num_test': 100, 'len_tra': 48.31, 'R_tra': 17.85, 'ctr': '0.369'}]
+[I 221217 11:36:27 utils:67] Epoch: [6], Info: [{'num_test': 100, 'len_tra': 46.98, 'R_tra': 20.74, 'ctr': '0.441'}]
+[I 221217 12:20:24 utils:67] Epoch: [7], Info: [{'num_test': 100, 'len_tra': 47.12, 'R_tra': 20.24, 'ctr': '0.430'}]
+[I 221217 13:04:56 utils:67] Epoch: [8], Info: [{'num_test': 100, 'len_tra': 46.17, 'R_tra': 23.3, 'ctr': '0.505'}]
+[I 221217 13:48:51 utils:67] Epoch: [9], Info: [{'num_test': 100, 'len_tra': 44.83, 'R_tra': 24.58, 'ctr': '0.548'}]
+[I 221217 14:31:50 utils:67] Epoch: [10], Info: [{'num_test': 100, 'len_tra': 46.62, 'R_tra': 26.43, 'ctr': '0.567'}]
+[I 221217 15:14:38 utils:67] Epoch: [11], Info: [{'num_test': 100, 'len_tra': 45.59, 'R_tra': 26.72, 'ctr': '0.586'}]
+[I 221217 15:56:39 utils:67] Epoch: [12], Info: [{'num_test': 100, 'len_tra': 46.0, 'R_tra': 26.51, 'ctr': '0.576'}]
+[I 221217 16:27:37 utils:67] Epoch: [13], Info: [{'num_test': 100, 'len_tra': 45.07, 'R_tra': 26.28, 'ctr': '0.583'}]
+[I 221217 16:50:50 utils:67] Epoch: [14], Info: [{'num_test': 100, 'len_tra': 45.7, 'R_tra': 31.5, 'ctr': '0.689'}]
+[I 221217 17:13:27 utils:67] Epoch: [15], Info: [{'num_test': 100, 'len_tra': 44.37, 'R_tra': 32.37, 'ctr': '0.730'}]
+[I 221217 17:36:38 utils:67] Epoch: [16], Info: [{'num_test': 100, 'len_tra': 46.67, 'R_tra': 31.65, 'ctr': '0.678'}]
+[I 221217 17:59:04 utils:67] Epoch: [17], Info: [{'num_test': 100, 'len_tra': 45.79, 'R_tra': 29.78, 'ctr': '0.650'}]
+[I 221217 18:21:28 utils:67] Epoch: [18], Info: [{'num_test': 100, 'len_tra': 45.74, 'R_tra': 33.54, 'ctr': '0.733'}]
+[I 221217 18:42:47 utils:67] Epoch: [19], Info: [{'num_test': 100, 'len_tra': 45.17, 'R_tra': 30.8, 'ctr': '0.682'}]
+[I 221217 19:04:15 utils:67] Epoch: [20], Info: [{'num_test': 100, 'len_tra': 44.85, 'R_tra': 30.6, 'ctr': '0.682'}]
+[I 221217 19:26:39 utils:67] Epoch: [21], Info: [{'num_test': 100, 'len_tra': 44.29, 'R_tra': 29.4, 'ctr': '0.664'}]
+[I 221217 19:48:38 utils:67] Epoch: [22], Info: [{'num_test': 100, 'len_tra': 43.84, 'R_tra': 28.85, 'ctr': '0.658'}]
+[I 221217 20:10:16 utils:67] Epoch: [23], Info: [{'num_test': 100, 'len_tra': 41.87, 'R_tra': 30.46, 'ctr': '0.727'}]
+[I 221217 20:32:37 utils:67] Epoch: [24], Info: [{'num_test': 100, 'len_tra': 45.36, 'R_tra': 33.29, 'ctr': '0.734'}]
+[I 221217 20:54:50 utils:67] Epoch: [25], Info: [{'num_test': 100, 'len_tra': 43.49, 'R_tra': 32.68, 'ctr': '0.751'}]
+[I 221217 21:15:46 utils:67] Epoch: [26], Info: [{'num_test': 100, 'len_tra': 42.32, 'R_tra': 33.71, 'ctr': '0.797'}]
+[I 221217 21:37:15 utils:67] Epoch: [27], Info: [{'num_test': 100, 'len_tra': 42.15, 'R_tra': 30.29, 'ctr': '0.719'}]
+[I 221217 21:58:41 utils:67] Epoch: [28], Info: [{'num_test': 100, 'len_tra': 43.79, 'R_tra': 37.84, 'ctr': '0.864'}]
+[I 221217 22:20:33 utils:67] Epoch: [29], Info: [{'num_test': 100, 'len_tra': 44.33, 'R_tra': 35.19, 'ctr': '0.794'}]
+[I 221217 22:42:59 utils:67] Epoch: [30], Info: [{'num_test': 100, 'len_tra': 46.13, 'R_tra': 29.47, 'ctr': '0.639'}]
+[I 221217 23:05:10 utils:67] Epoch: [31], Info: [{'num_test': 100, 'len_tra': 45.02, 'R_tra': 31.56, 'ctr': '0.701'}]
+[I 221217 23:27:22 utils:67] Epoch: [32], Info: [{'num_test': 100, 'len_tra': 45.68, 'R_tra': 32.99, 'ctr': '0.722'}]
+[I 221217 23:49:48 utils:67] Epoch: [33], Info: [{'num_test': 100, 'len_tra': 44.5, 'R_tra': 28.68, 'ctr': '0.644'}]
+[I 221218 00:12:28 utils:67] Epoch: [34], Info: [{'num_test': 100, 'len_tra': 44.92, 'R_tra': 31.02, 'ctr': '0.691'}]
+[I 221218 00:33:29 utils:67] Epoch: [35], Info: [{'num_test': 100, 'len_tra': 43.31, 'R_tra': 33.7, 'ctr': '0.778'}]
+[I 221218 00:54:01 utils:67] Epoch: [36], Info: [{'num_test': 100, 'len_tra': 44.99, 'R_tra': 34.36, 'ctr': '0.764'}]
+[I 221218 01:13:28 utils:67] Epoch: [37], Info: [{'num_test': 100, 'len_tra': 40.85, 'R_tra': 31.98, 'ctr': '0.783'}]
+[I 221218 01:33:39 utils:67] Epoch: [38], Info: [{'num_test': 100, 'len_tra': 40.17, 'R_tra': 36.31, 'ctr': '0.904'}]
+[I 221218 01:53:30 utils:67] Epoch: [39], Info: [{'num_test': 100, 'len_tra': 40.11, 'R_tra': 32.39, 'ctr': '0.808'}]
+[I 221218 02:15:10 utils:67] Epoch: [40], Info: [{'num_test': 100, 'len_tra': 45.23, 'R_tra': 32.89, 'ctr': '0.727'}]
+[I 221218 02:37:24 utils:67] Epoch: [41], Info: [{'num_test': 100, 'len_tra': 44.56, 'R_tra': 34.07, 'ctr': '0.765'}]
+[I 221218 02:58:59 utils:67] Epoch: [42], Info: [{'num_test': 100, 'len_tra': 45.3, 'R_tra': 36.35, 'ctr': '0.802'}]
+[I 221218 03:21:09 utils:67] Epoch: [43], Info: [{'num_test': 100, 'len_tra': 44.16, 'R_tra': 33.16, 'ctr': '0.751'}]
+[I 221218 03:42:54 utils:67] Epoch: [44], Info: [{'num_test': 100, 'len_tra': 45.9, 'R_tra': 37.57, 'ctr': '0.819'}]
+[I 221218 04:04:04 utils:67] Epoch: [45], Info: [{'num_test': 100, 'len_tra': 44.17, 'R_tra': 35.72, 'ctr': '0.809'}]
+[I 221218 04:24:05 utils:67] Epoch: [46], Info: [{'num_test': 100, 'len_tra': 42.9, 'R_tra': 33.17, 'ctr': '0.773'}]
+[I 221218 04:44:02 utils:67] Epoch: [47], Info: [{'num_test': 100, 'len_tra': 42.74, 'R_tra': 33.65, 'ctr': '0.787'}]
+[I 221218 05:03:59 utils:67] Epoch: [48], Info: [{'num_test': 100, 'len_tra': 42.84, 'R_tra': 33.61, 'ctr': '0.785'}]
+[I 221218 05:24:13 utils:67] Epoch: [49], Info: [{'num_test': 100, 'len_tra': 45.79, 'R_tra': 35.5, 'ctr': '0.775'}]
+[I 221218 05:44:00 utils:67] Epoch: [50], Info: [{'num_test': 100, 'len_tra': 43.54, 'R_tra': 33.54, 'ctr': '0.770'}]
+[I 221218 06:03:45 utils:67] Epoch: [51], Info: [{'num_test': 100, 'len_tra': 44.97, 'R_tra': 34.09, 'ctr': '0.758'}]
+[I 221218 06:23:10 utils:67] Epoch: [52], Info: [{'num_test': 100, 'len_tra': 42.74, 'R_tra': 33.26, 'ctr': '0.778'}]
+[I 221218 06:42:07 utils:67] Epoch: [53], Info: [{'num_test': 100, 'len_tra': 43.35, 'R_tra': 34.65, 'ctr': '0.799'}]
+[I 221218 07:01:40 utils:67] Epoch: [54], Info: [{'num_test': 100, 'len_tra': 41.7, 'R_tra': 30.83, 'ctr': '0.739'}]
+[I 221218 07:21:59 utils:67] Epoch: [55], Info: [{'num_test': 100, 'len_tra': 45.11, 'R_tra': 34.92, 'ctr': '0.774'}]
+[I 221218 07:43:13 utils:67] Epoch: [56], Info: [{'num_test': 100, 'len_tra': 46.69, 'R_tra': 32.29, 'ctr': '0.692'}]
+[I 221218 08:03:57 utils:67] Epoch: [57], Info: [{'num_test': 100, 'len_tra': 44.77, 'R_tra': 34.36, 'ctr': '0.767'}]
+[I 221218 08:25:19 utils:67] Epoch: [58], Info: [{'num_test': 100, 'len_tra': 46.67, 'R_tra': 34.68, 'ctr': '0.743'}]
+[I 221218 08:46:27 utils:67] Epoch: [59], Info: [{'num_test': 100, 'len_tra': 42.92, 'R_tra': 34.19, 'ctr': '0.797'}]
+[I 221218 09:07:45 utils:67] Epoch: [60], Info: [{'num_test': 100, 'len_tra': 42.53, 'R_tra': 33.41, 'ctr': '0.786'}]
+[I 221218 09:29:27 utils:67] Epoch: [61], Info: [{'num_test': 100, 'len_tra': 45.73, 'R_tra': 38.02, 'ctr': '0.831'}]
+[I 221218 09:45:53 utils:67] Epoch: [62], Info: [{'num_test': 100, 'len_tra': 45.54, 'R_tra': 38.22, 'ctr': '0.839'}]
+[I 221218 09:55:24 utils:67] Epoch: [63], Info: [{'num_test': 100, 'len_tra': 42.62, 'R_tra': 38.15, 'ctr': '0.895'}]
+[I 221218 10:04:51 utils:67] Epoch: [64], Info: [{'num_test': 100, 'len_tra': 45.05, 'R_tra': 41.54, 'ctr': '0.922'}]
+[I 221218 10:14:14 utils:67] Epoch: [65], Info: [{'num_test': 100, 'len_tra': 44.32, 'R_tra': 40.3, 'ctr': '0.909'}]
+[I 221218 10:23:41 utils:67] Epoch: [66], Info: [{'num_test': 100, 'len_tra': 44.78, 'R_tra': 41.64, 'ctr': '0.930'}]
+[I 221218 10:34:03 utils:67] Epoch: [67], Info: [{'num_test': 100, 'len_tra': 43.7, 'R_tra': 38.66, 'ctr': '0.885'}]
+[I 221218 10:44:34 utils:67] Epoch: [68], Info: [{'num_test': 100, 'len_tra': 46.04, 'R_tra': 43.27, 'ctr': '0.940'}]
+[I 221218 10:50:16 utils:67] Epoch: [69], Info: [{'num_test': 100, 'len_tra': 43.89, 'R_tra': 40.26, 'ctr': '0.917'}]
+[I 221218 10:55:48 utils:67] Epoch: [70], Info: [{'num_test': 100, 'len_tra': 41.49, 'R_tra': 38.33, 'ctr': '0.924'}]
+[I 221218 11:02:13 utils:67] Epoch: [71], Info: [{'num_test': 100, 'len_tra': 44.27, 'R_tra': 35.65, 'ctr': '0.805'}]
+[I 221218 11:11:44 utils:67] Epoch: [72], Info: [{'num_test': 100, 'len_tra': 43.96, 'R_tra': 39.79, 'ctr': '0.905'}]
+[I 221218 11:21:24 utils:67] Epoch: [73], Info: [{'num_test': 100, 'len_tra': 46.5, 'R_tra': 38.12, 'ctr': '0.820'}]
+[I 221218 11:30:56 utils:67] Epoch: [74], Info: [{'num_test': 100, 'len_tra': 43.07, 'R_tra': 40.73, 'ctr': '0.946'}]
+[I 221218 11:40:45 utils:67] Epoch: [75], Info: [{'num_test': 100, 'len_tra': 44.07, 'R_tra': 42.36, 'ctr': '0.961'}]
+[I 221218 11:50:52 utils:67] Epoch: [76], Info: [{'num_test': 100, 'len_tra': 44.09, 'R_tra': 41.39, 'ctr': '0.939'}]
+[I 221218 12:01:18 utils:67] Epoch: [77], Info: [{'num_test': 100, 'len_tra': 43.13, 'R_tra': 37.77, 'ctr': '0.876'}]
+[I 221218 12:12:25 utils:67] Epoch: [78], Info: [{'num_test': 100, 'len_tra': 44.56, 'R_tra': 39.59, 'ctr': '0.888'}]
+[I 221218 12:25:28 utils:67] Epoch: [79], Info: [{'num_test': 100, 'len_tra': 42.79, 'R_tra': 41.73, 'ctr': '0.975'}]
+[I 221218 12:36:31 utils:67] Epoch: [80], Info: [{'num_test': 100, 'len_tra': 45.82, 'R_tra': 45.44, 'ctr': '0.992'}]
+[I 221218 12:48:05 utils:67] Epoch: [81], Info: [{'num_test': 100, 'len_tra': 43.33, 'R_tra': 45.15, 'ctr': '1.042'}]
+[I 221218 13:00:19 utils:67] Epoch: [82], Info: [{'num_test': 100, 'len_tra': 46.52, 'R_tra': 44.66, 'ctr': '0.960'}]
+[I 221218 13:13:04 utils:67] Epoch: [83], Info: [{'num_test': 100, 'len_tra': 43.03, 'R_tra': 45.11, 'ctr': '1.048'}]
+[I 221218 13:27:27 utils:67] Epoch: [84], Info: [{'num_test': 100, 'len_tra': 46.28, 'R_tra': 45.84, 'ctr': '0.990'}]
+[I 221218 13:43:13 utils:67] Epoch: [85], Info: [{'num_test': 100, 'len_tra': 46.22, 'R_tra': 42.57, 'ctr': '0.921'}]
+[I 221218 13:58:26 utils:67] Epoch: [86], Info: [{'num_test': 100, 'len_tra': 45.43, 'R_tra': 39.69, 'ctr': '0.874'}]
+[I 221218 14:15:10 utils:67] Epoch: [87], Info: [{'num_test': 100, 'len_tra': 46.41, 'R_tra': 37.73, 'ctr': '0.813'}]
+[I 221218 14:30:58 utils:67] Epoch: [88], Info: [{'num_test': 100, 'len_tra': 46.21, 'R_tra': 30.14, 'ctr': '0.652'}]
+[I 221218 14:47:01 utils:67] Epoch: [89], Info: [{'num_test': 100, 'len_tra': 45.52, 'R_tra': 27.87, 'ctr': '0.612'}]
+[I 221218 15:04:01 utils:67] Epoch: [90], Info: [{'num_test': 100, 'len_tra': 45.86, 'R_tra': 31.47, 'ctr': '0.686'}]
+[I 221218 15:19:38 utils:67] Epoch: [91], Info: [{'num_test': 100, 'len_tra': 46.91, 'R_tra': 31.48, 'ctr': '0.671'}]
+[I 221218 15:36:06 utils:67] Epoch: [92], Info: [{'num_test': 100, 'len_tra': 44.71, 'R_tra': 28.25, 'ctr': '0.632'}]
+[I 221218 15:57:12 utils:67] Epoch: [93], Info: [{'num_test': 100, 'len_tra': 42.24, 'R_tra': 29.74, 'ctr': '0.704'}]
+[I 221218 16:08:37 utils:67] Epoch: [94], Info: [{'num_test': 100, 'len_tra': 44.15, 'R_tra': 29.24, 'ctr': '0.662'}]
+[I 221218 16:20:40 utils:67] Epoch: [95], Info: [{'num_test': 100, 'len_tra': 44.73, 'R_tra': 30.01, 'ctr': '0.671'}]
+[I 221218 16:32:42 utils:67] Epoch: [96], Info: [{'num_test': 100, 'len_tra': 41.21, 'R_tra': 31.93, 'ctr': '0.775'}]
+[I 221218 16:44:07 utils:67] Epoch: [97], Info: [{'num_test': 100, 'len_tra': 44.59, 'R_tra': 34.11, 'ctr': '0.765'}]
+[I 221218 16:55:39 utils:67] Epoch: [98], Info: [{'num_test': 100, 'len_tra': 42.82, 'R_tra': 34.27, 'ctr': '0.800'}]
+[I 221218 17:07:28 utils:67] Epoch: [99], Info: [{'num_test': 100, 'len_tra': 43.95, 'R_tra': 35.43, 'ctr': '0.806'}]
+[I 221218 17:19:11 utils:67] Epoch: [100], Info: [{'num_test': 100, 'len_tra': 42.94, 'R_tra': 37.6, 'ctr': '0.876'}]

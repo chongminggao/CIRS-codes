@@ -1,0 +1,27 @@
+[I 211113 03:17:21 MLP-taobao:91] {
+      "resume": false,
+      "env": "VirtualTB-v0",
+      "feature_dim": 4,
+      "model_name": "MLP-RL",
+      "dnn": [
+        256,
+        256
+      ],
+      "batch_size": 100,
+      "epoch": 10,
+      "cuda": 2,
+      "leave_threshold": 1.0,
+      "num_leave_compute": 5,
+      "message": "MLP-leave1"
+    }
+[I 211113 03:18:13 utils:39] Epoch: [0], Info: [{'loss': 0.5302576809692383, 'RL_val_CTR': 3.92, 'RL_val_click_loss': 2.391660950024743, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 7.84}]
+[I 211113 03:18:46 utils:39] Epoch: [1], Info: [{'loss': 0.11371385355949402, 'RL_val_CTR': 4.16, 'RL_val_click_loss': 2.225511038964614, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 8.32}]
+[I 211113 03:19:10 utils:39] Epoch: [2], Info: [{'loss': 0.02356683232307434, 'RL_val_CTR': 4.43, 'RL_val_click_loss': 2.402761349231005, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 8.86}]
+[I 211113 03:19:43 utils:39] Epoch: [3], Info: [{'loss': 0.005912004954963922, 'RL_val_CTR': 3.9, 'RL_val_click_loss': 2.2666610685596242, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 7.8}]
+[I 211113 03:20:18 utils:39] Epoch: [4], Info: [{'loss': 0.0029824475495144726, 'RL_val_CTR': 4.18, 'RL_val_click_loss': 2.174003464807756, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 8.36}]
+[I 211113 03:20:51 utils:39] Epoch: [5], Info: [{'loss': 0.002578588053621352, 'RL_val_CTR': 4.32, 'RL_val_click_loss': 2.2372085521230476, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 8.64}]
+[I 211113 03:21:25 utils:39] Epoch: [6], Info: [{'loss': 0.0025416930888406933, 'RL_val_CTR': 4.155, 'RL_val_click_loss': 2.156883171587251, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 8.31}]
+[I 211113 03:21:52 utils:39] Epoch: [7], Info: [{'loss': 0.0025403414231166244, 'RL_val_CTR': 4.45, 'RL_val_click_loss': 2.279028155785054, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 8.9}]
+[I 211113 03:22:23 utils:39] Epoch: [8], Info: [{'loss': 0.0025396500167623164, 'RL_val_CTR': 4.3, 'RL_val_click_loss': 2.2280587000772356, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 8.6}]
+[I 211113 03:22:49 utils:39] Epoch: [9], Info: [{'loss': 0.002541052906028926, 'RL_val_CTR': 4.07, 'RL_val_click_loss': 2.1386994309397416, 'RL_val_trajectory_len': 2.0, 'RL_val_trajectory_reward': 8.14}]
+[I 211113 03:22:49 MLP-taobao:139] {'loss': [0.5302576809692383, 0.11371385355949402, 0.02356683232307434, 0.005912004954963922, 0.0029824475495144726, 0.002578588053621352, 0.0025416930888406933, 0.0025403414231166244, 0.0025396500167623164, 0.002541052906028926], 'RL_val_CTR': [3.92, 4.16, 4.43, 3.9, 4.18, 4.32, 4.155, 4.45, 4.3, 4.07], 'RL_val_click_loss': [2.391660950024743, 2.225511038964614, 2.402761349231005, 2.2666610685596242, 2.174003464807756, 2.2372085521230476, 2.156883171587251, 2.279028155785054, 2.2280587000772356, 2.1386994309397416], 'RL_val_trajectory_len': [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0], 'RL_val_trajectory_reward': [7.84, 8.32, 8.86, 7.8, 8.36, 8.64, 8.31, 8.9, 8.6, 8.14]}

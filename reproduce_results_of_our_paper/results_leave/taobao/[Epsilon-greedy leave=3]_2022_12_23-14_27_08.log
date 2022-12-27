@@ -1,0 +1,30 @@
+[I 221223 14:27:08 MLP-epsilonGreedy-taobao:97] {
+      "resume": false,
+      "env": "VirtualTB-v0",
+      "feature_dim": 4,
+      "model_name": "MLP-RL-epsilon",
+      "dnn": [
+        256,
+        256
+      ],
+      "batch_size": 100,
+      "epoch": 10,
+      "cuda": 6,
+      "epsilon": 0.1,
+      "leave_threshold": 3.0,
+      "num_leave_compute": 5,
+      "max_turn": 50,
+      "message": "Epsilon-greedy leave=3"
+    }
+[I 221223 14:33:51 utils:48] Epoch: [-1], Info: [{'CTR': 0.028169014084507043, 'click_loss': 0.16821423767598023, 'trajectory_len': 2.13, 'trajectory_reward': 0.06}]
+[I 221223 14:39:00 utils:48] Epoch: [0], Info: [{'loss': 0.5310544791030883, 'CTR': 3.9305555555555554, 'click_loss': 2.509659737555517, 'trajectory_len': 2.16, 'trajectory_reward': 8.49}]
+[I 221223 14:44:21 utils:48] Epoch: [1], Info: [{'loss': 0.11392442499637603, 'CTR': 3.782608695652174, 'click_loss': 2.556520928795211, 'trajectory_len': 2.07, 'trajectory_reward': 7.83}]
+[I 221223 14:49:41 utils:48] Epoch: [2], Info: [{'loss': 0.023609205636382104, 'CTR': 3.80188679245283, 'click_loss': 2.575902270601254, 'trajectory_len': 2.12, 'trajectory_reward': 8.06}]
+[I 221223 14:54:58 utils:48] Epoch: [3], Info: [{'loss': 0.005941827082931996, 'CTR': 3.9473684210526314, 'click_loss': 2.43848630400936, 'trajectory_len': 2.09, 'trajectory_reward': 8.25}]
+[I 221223 15:00:14 utils:48] Epoch: [4], Info: [{'loss': 0.0030203668547049167, 'CTR': 3.723004694835681, 'click_loss': 2.404852060170433, 'trajectory_len': 2.13, 'trajectory_reward': 7.93}]
+[I 221223 15:05:29 utils:48] Epoch: [5], Info: [{'loss': 0.002582768547926098, 'CTR': 3.5943396226415096, 'click_loss': 2.299362637972424, 'trajectory_len': 2.12, 'trajectory_reward': 7.62}]
+[I 221223 15:10:45 utils:48] Epoch: [6], Info: [{'loss': 0.0025420016254484655, 'CTR': 3.7783018867924527, 'click_loss': 2.419706747142317, 'trajectory_len': 2.12, 'trajectory_reward': 8.01}]
+[I 221223 15:16:09 utils:48] Epoch: [7], Info: [{'loss': 0.0025401745194382967, 'CTR': 3.755868544600939, 'click_loss': 2.305823602954127, 'trajectory_len': 2.13, 'trajectory_reward': 8.0}]
+[I 221223 15:22:12 utils:48] Epoch: [8], Info: [{'loss': 0.0025408345911093057, 'CTR': 3.824644549763033, 'click_loss': 2.2540591982285982, 'trajectory_len': 2.11, 'trajectory_reward': 8.07}]
+[I 221223 15:26:03 utils:48] Epoch: [9], Info: [{'loss': 0.0025406613012589514, 'CTR': 3.705607476635514, 'click_loss': 2.243092983099414, 'trajectory_len': 2.14, 'trajectory_reward': 7.93}]
+[I 221223 15:26:03 MLP-epsilonGreedy-taobao:146] {}
