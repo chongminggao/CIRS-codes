@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/7/26 10:15 上午
-# @Author  : Chongming GAO
-# @FileName: train_staticRS_on_logData_evaluate_in_realEnv.py
-
 
 import argparse
 import collections
@@ -22,12 +18,10 @@ from torch import nn
 
 from core.inputs import SparseFeatP
 from core.user_model_DICE import UserModel_DICE
-from core.util import compute_exposure_each_user, negative_sampling, get_similarity_mat, \
-    load_static_validate_data_kuaishou
+from core.util import negative_sampling, load_static_validate_data_kuaishou
 from deepctr_torch.inputs import DenseFeat
 import pandas as pd
 import numpy as np
-from tensorflow.python.keras.callbacks import Callback
 
 from core.static_dataset import StaticDataset
 
@@ -48,7 +42,6 @@ def get_args():
     parser.add_argument('--resume', action="store_true")
     parser.add_argument("--env", type=str, default='KuaishouEnv-v0')
 
-
     # recommendation related:
     # parser.add_argument('--not_softmax', action="store_false")
     parser.add_argument('--is_softmax', dest='is_softmax', action='store_true')
@@ -60,7 +53,7 @@ def get_args():
     parser.add_argument("--num_trajectory", type=int, default=200)
     parser.add_argument("--force_length", type=int, default=10)
     parser.add_argument('--epsilon', default=0, type=float)
-    parser.add_argument("--top_rate", type=float, default=0.6)
+    parser.add_argument("--top_rate", type=float, default=0.8)
 
     parser.add_argument("--feature_dim", type=int, default=16)
     parser.add_argument("--entity_dim", type=int, default=16)
@@ -188,6 +181,7 @@ def load_dataset_kuaishou_DICE(entity_dim, feature_dim, MODEL_SAVE_PATH):
 
     return dataset, x_columns, y_columns
 
+
 def main(args):
     args.entity_dim = args.feature_dim
     # %% 1. Create dirs
@@ -271,9 +265,6 @@ def main(args):
     REMOTE_PATH = os.path.join(REMOTE_ROOT, os.path.dirname(LOCAL_PATH))
 
     # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
-
-
-
 
 
 sigmoid = nn.Sigmoid()

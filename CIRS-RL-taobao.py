@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/8/2 4:30 下午
-# @Author  : Chongming GAO
-# @FileName: train_RL_in_simulatedEnv_evaluate_in_realEnv.py
 import datetime
 import functools
 import json
@@ -18,25 +15,19 @@ import numpy as np
 from core.inputs import get_dataset_columns
 from core.user_model_mmoe import UserModel_MMOE
 
-# from tensorflow.python.keras.callbacks import Callback
-# from tensorflow.python.keras.callbacks import History
-
 from torch.distributions import Independent, Normal
 from torch.utils.tensorboard import SummaryWriter
 
 from core.collector import Collector
-# from tianshou.data import Collector
 from core.state_tracker import StateTrackerTransformer
 from core.user_model import compute_input_dim
 from core.policy.ppo import PPOPolicy
 from tianshou.utils import BasicLogger
 from tianshou.env import DummyVectorEnv
 from tianshou.utils.net.common import Net
-# from tianshou.trainer import onpolicy_trainer
 from core.trainer.onpolicy import onpolicy_trainer
 from tianshou.data import VectorReplayBuffer
-from tianshou.utils.net.continuous import ActorProb, Critic, Actor
-# from tianshou.utils.net.discrete import Actor, Critic
+from tianshou.utils.net.continuous import ActorProb, Critic
 
 import logzero
 from logzero import logger
@@ -141,7 +132,8 @@ def main(args):
     # %% 2. prepare user model
 
     USERMODEL_Path = os.path.join(".", "saved_models", args.env, args.user_model_name)
-    model_parameter_path = os.path.join(USERMODEL_Path, "{}_params_{}.pickle".format(args.user_model_name, args.read_message))
+    model_parameter_path = os.path.join(USERMODEL_Path,
+                                        "{}_params_{}.pickle".format(args.user_model_name, args.read_message))
     model_save_path = os.path.join(USERMODEL_Path, "{}_{}.pt".format(args.user_model_name, args.read_message))
 
     with open(model_parameter_path, "rb") as file:
@@ -196,7 +188,7 @@ def main(args):
 
     # %% 4. Setup model
     user_columns, action_columns, feedback_columns, \
-    has_user_embedding, has_action_embedding, has_feedback_embedding = \
+        has_user_embedding, has_action_embedding, has_feedback_embedding = \
         get_dataset_columns(args.dim_model, envname=args.env)
 
     assert args.dim_model == compute_input_dim(action_columns)
@@ -234,7 +226,6 @@ def main(args):
 
     def dist(*logits):
         return Independent(Normal(*logits), 1)
-  
 
     policy = PPOPolicy(
         actor, critic, optim, dist,
@@ -318,20 +309,20 @@ def main(args):
 
     # %% 7. save info
 
-
     # torch.save(model.state_dict(), model_save_path)
     torch.save({
         'policy': policy.cpu().state_dict(),
         'optim_RL': optim[0].state_dict(),
         'optim_state': optim[1].state_dict(),
         'state_tracker': state_tracker.cpu().state_dict(),
-    },model_save_path)
+    }, model_save_path)
 
     REMOTE_ROOT = "/root/Counterfactual_IRS"
     LOCAL_PATH = logger_path
     REMOTE_PATH = os.path.join(REMOTE_ROOT, os.path.dirname(LOCAL_PATH))
 
     # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
+
 
 def save_model_fn(epoch, policy, model_save_path, optim, state_tracker, is_save=False):
     if not is_save:

@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/8/2 4:30 下午
-# @Author  : Chongming GAO
-# @FileName: train_RL_in_simulatedEnv_evaluate_in_realEnv.py
 import datetime
 import functools
 import json
@@ -18,14 +15,9 @@ import numpy as np
 from core.collector_set import CollectorSet
 from core.inputs import get_dataset_columns
 
-from tensorflow.python.keras.callbacks import Callback
-from tensorflow.python.keras.callbacks import History
-
-from torch.distributions import Independent, Normal
 from torch.utils.tensorboard import SummaryWriter
 
 from core.collector import Collector
-# from tianshou.data import Collector
 from core.state_tracker import StateTrackerTransformer
 from core.user_model import compute_input_dim
 from core.policy.ppo import PPOPolicy
@@ -38,7 +30,6 @@ from tianshou.utils.net.common import Net
 # from tianshou.trainer import onpolicy_trainer
 from core.trainer.onpolicy import onpolicy_trainer
 from tianshou.data import VectorReplayBuffer
-from tianshou.utils.net.continuous import ActorProb
 from tianshou.utils.net.discrete import Actor, Critic
 
 import logzero
@@ -70,7 +61,6 @@ def get_args():
     parser.add_argument('--no_save', dest='is_save', action='store_false')
     parser.set_defaults(is_save=False)
 
-
     # Env
     parser.add_argument("--version", type=str, default="v1")
     parser.add_argument('--tau', default=100, type=float)
@@ -87,7 +77,7 @@ def get_args():
     parser.add_argument('--nhead', default=4, type=int)
     # parser.add_argument('--max_len', default=100, type=int)
     parser.add_argument('--force_length', type=int, default=10)
-    parser.add_argument("--top_rate", type=float, default=0.6)
+    parser.add_argument("--top_rate", type=float, default=0.8)
 
     # tianshou
     parser.add_argument('--buffer-size', type=int, default=11000)
@@ -238,7 +228,7 @@ def main(args):
     # %% 4. Setup model
 
     user_columns, action_columns, feedback_columns, \
-    has_user_embedding, has_action_embedding, has_feedback_embedding = \
+        has_user_embedding, has_action_embedding, has_feedback_embedding = \
         get_dataset_columns(args.dim_model, envname=args.env, env=env)
 
     assert args.dim_model == compute_input_dim(action_columns)
@@ -271,9 +261,9 @@ def main(args):
 
     # replace DiagGuassian with Independent(Normal) which is equivalent
     # pass *logits to be consistent with policy.forward
-    
+
     dist = torch.distributions.Categorical
-    
+
     policy = PPOPolicy(
         actor, critic, optim, dist,
         # state_tracker=state_tracker,
@@ -313,40 +303,13 @@ def main(args):
     writer = SummaryWriter(log_path)
     logger1 = BasicLogger(writer, save_interval=args.save_interval)
 
-    # def save_fn(policy):
-    #     torch.save(policy.state_dict(), os.path.join(log_path, 'policy.pth'))
-    #
-    # def stop_fn(mean_rewards):
-    #     return mean_rewards >= simulatedEnv.spec.reward_threshold
-    #
-    # def save_checkpoint_fn(epoch, env_step, gradient_step):
-    #     # see also: https://pytorch.org/tutorials/beginner/saving_loading_models.html
-    #     torch.save({
-    #         'model': policy.state_dict(),
-    #         'optim_RL': optim[0].state_dict(),
-    #         'optim_state': optim[1].state_dict(),
-    #     }, os.path.join(log_path, 'checkpoint.pth'))
-
-    # if args.resume:
-    #     # load from existing checkpoint
-    #     print(f"Loading agent under {log_path}")
-    #     ckpt_path = os.path.join(log_path, 'checkpoint.pth')
-    #     if os.path.exists(ckpt_path):
-    #         checkpoint = torch.load(ckpt_path, map_location=args.device)
-    #         policy.load_state_dict(checkpoint['model'])
-    #         optim.load_state_dict(checkpoint['optim'])
-    #         print("Successfully restore policy and optim.")
-    #     else:
-    #         print("Fail to restore policy and optim.")
-
-    # policy.callbacks = [LoggerCallback_RL(logger_path)]
-
     # df_val, df_user_val, df_item_val, list_feat = get_df_kuairec(name="small_matrix.csv")
     df_item_val = load_item_feat(only_small=True)
     item_feat_domination = get_training_item_domination()
 
     policy.callbacks = [
-        Callback_Coverage_Count(test_collector_set, df_item_val, need_transform=True, item_feat_domination=item_feat_domination,
+        Callback_Coverage_Count(test_collector_set, df_item_val, need_transform=True,
+                                item_feat_domination=item_feat_domination,
                                 lbe_photo=env.lbe_photo, top_rate=args.top_rate),
         LoggerCallback_Policy(logger_path, args.force_length)]
 
@@ -381,11 +344,6 @@ def main(args):
         'state_tracker': state_tracker.cpu().state_dict(),
     }, model_save_path)
 
-    REMOTE_ROOT = "/root/Counterfactual_IRS"
-    LOCAL_PATH = logger_path
-    REMOTE_PATH = os.path.join(REMOTE_ROOT, os.path.dirname(LOCAL_PATH))
-
-    # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
 
 def save_model_fn(epoch, policy, model_save_path, optim, state_tracker, is_save=False):
     if not is_save:
@@ -398,6 +356,7 @@ def save_model_fn(epoch, policy, model_save_path, optim, state_tracker, is_save=
         'optim_state': optim[1].state_dict(),
         'state_tracker': state_tracker.state_dict(),
     }, model_save_path)
+
 
 if __name__ == '__main__':
     args = get_args()

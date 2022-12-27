@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/7/26 10:15 上午
-# @Author  : Chongming GAO
-# @FileName: train_staticRS_on_logData_evaluate_in_realEnv.py
-
 
 import argparse
 import collections
@@ -19,7 +15,6 @@ import torch
 
 from deepctr_torch.inputs import DenseFeat
 import pandas as pd
-from keras.callbacks import Callback
 
 from core.static_dataset import StaticDataset
 from core.user_model_mmoe import UserModel_MMOE
@@ -27,7 +22,6 @@ import logzero
 from logzero import logger
 
 from evaluation import test_taobao
-# from util.upload import my_upload
 from util.utils import create_dir, LoggerCallback_Update
 
 
@@ -113,11 +107,7 @@ def main(args):
 
     SEED = 2022
 
-    # tasks = "regression"
-    # task_loss = collections.OrderedDict({feat.name: "mse" for feat in y_columns})
-    # model = UserModel_DeepFM(x_columns, y_columns, tasks,
-    #                          dnn_hidden_units=args.dnn, seed=SEED,
-    #                          device=device)
+
 
     tasks = collections.OrderedDict({feat.name: "regression" for feat in y_columns})
     # task_loss_dict = collections.OrderedDict({feat.name: "mse" for feat in y_columns})
@@ -140,13 +130,6 @@ def main(args):
                              batch_size=args.batch_size, epochs=args.epoch,
                              callbacks=[LoggerCallback_Update(logger_path)])
     logger.info(history.history)
-
-    REMOTE_ROOT = "/root/Counterfactual_IRS"
-    LOCAL_PATH = logger_path
-    REMOTE_PATH = os.path.join(REMOTE_ROOT, os.path.dirname(LOCAL_PATH))
-
-    # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
-
 
 
 

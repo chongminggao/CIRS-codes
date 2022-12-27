@@ -19,7 +19,6 @@ import torch
 
 from deepctr_torch.inputs import DenseFeat
 import pandas as pd
-from keras.callbacks import Callback
 
 from core.static_dataset import StaticDataset
 from core.user_model_mmoe import UserModel_MMOE
@@ -27,7 +26,6 @@ import logzero
 from logzero import logger
 
 from evaluation import test_taobao
-# from util.upload import my_upload
 from util.utils import create_dir, LoggerCallback_Update
 
 
@@ -117,11 +115,6 @@ def main(args):
 
     SEED = 2021
 
-    # tasks = "regression"
-    # task_loss = collections.OrderedDict({feat.name: "mse" for feat in y_columns})
-    # model = UserModel_DeepFM(x_columns, y_columns, tasks,
-    #                          dnn_hidden_units=args.dnn, seed=SEED,
-    #                          device=device)
 
     tasks = collections.OrderedDict({feat.name: "regression" for feat in y_columns})
     # task_loss_dict = collections.OrderedDict({feat.name: "mse" for feat in y_columns})

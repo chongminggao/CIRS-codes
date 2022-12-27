@@ -55,7 +55,7 @@ def get_args():
     parser.add_argument("--num_trajectory", type=int, default=200)
     parser.add_argument("--force_length", type=int, default=10)
     parser.add_argument('--epsilon', default=0, type=float)
-    parser.add_argument("--top_rate", type=float, default=0.6)
+    parser.add_argument("--top_rate", type=float, default=0.8)
 
     parser.add_argument('--l2_reg_dnn', default=0.1, type=float)
 
@@ -250,7 +250,7 @@ sigmoid = nn.Sigmoid()
 def loss_kuaishou_IPS_pairwise(y, y_deepfm_pos, y_deepfm_neg, IPS_score):
     loss_y = (((y_deepfm_pos - y) ** 2) * IPS_score).mean()
 
-    bpr_click = - (sigmoid(y_deepfm_pos - y_deepfm_neg).log()).mean()
+    bpr_click = - (sigmoid(y_deepfm_pos - y_deepfm_neg).log() * IPS_score).mean()
     loss = loss_y + bpr_click
     
     # loss = loss_y

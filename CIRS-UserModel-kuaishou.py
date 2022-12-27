@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/7/26 10:15 上午
-# @Author  : Chongming GAO
-# @FileName: train_staticRS_on_logData_evaluate_in_realEnv.py
-
 
 import argparse
 import functools
@@ -63,7 +59,7 @@ def get_args():
 
     parser.add_argument("--num_trajectory", type=int, default=200)
     parser.add_argument("--force_length", type=int, default=10)
-    parser.add_argument("--top_rate", type=float, default=0.6)
+    parser.add_argument("--top_rate", type=float, default=0.8)
 
     parser.add_argument("--feature_dim", type=int, default=16)
     parser.add_argument("--entity_dim", type=int, default=16)

@@ -24,13 +24,13 @@ def create_dir(create_dirs):
 
 def walk_paths(result_dir):
     g = os.walk(result_dir)
-    # print(f"Reading all logs under [{result_dir}]")
+
     files = []
     for path, dir_list, file_list in g:
         for file_name in file_list:
             if file_name[0] == '.' or file_name[0] == '_':
                 continue
-            # print(os.path.join(path, file_name))
+            print(os.path.join(path, file_name))
             files.append(file_name)
     return files
 

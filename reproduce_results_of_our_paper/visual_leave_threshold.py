@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Author  : Chongming GAO
-# @FileName: visual_env.py
+# @FileName: visual_leave_threshold.py
 
 
 import os
@@ -10,50 +10,30 @@ import re
 
 import seaborn as sns
 import pandas as pd
-
 from matplotlib import pyplot as plt
+from visual_utils import walk_paths, loaddata, organize_df
 
-from visualization.visual_utils import walk_paths, loaddata, organize_df
-
-DATAPATH = "../environments/KuaishouRec/data"
-
-
-def handle_data(df_all):
-    data_r = df_all["R_tra"]
+def group_data(df_all, epoch=100):
+    data_r = df_all.loc[:epoch, "R_tra"]
     meandata = data_r.mean()
 
     pattern_name = re.compile("(.*)[-\s]leave[=]?(\d)")
 
-    df1 = pd.DataFrame()
-    for k, v in meandata.iteritems():
-        print(k)
+    df = pd.DataFrame()
+    for k, v in meandata.items():
+        # print(k)
         res = re.search(pattern_name, k)
         method = res.group(1)
         leave = res.group(2)
-        df1.loc[leave, method] = v
+        df.loc[leave, method] = v
 
-    # df = df.columns[2:]
-    # def mysub(name):
-    #     return re.sub(r'\sw[:_]o\s', ' w/o ', name, flags=re.IGNORECASE)
-    #
-    # df1.columns = list(map(mysub, df1.columns))
-    df1 = df1[sorted(df1.columns)]
+    df = df[sorted(df.columns)]
 
-    return df1
+    return df
 
 
 
-def visual_env(df_kuaishou, df_taobao, save_fig_dir, savename):
-    # ways_kuaishou = df_kuaishou.columns.levels[0]
-    # metrics_kuaishou = df_kuaishou.columns.levels[1]
-    # methods_kuaishou = df_kuaishou.columns.levels[1]
-
-    # ways_taobao = df_taobao.columns.levels[0]
-    # metrics_taobao = df_taobao.columns.levels[1]
-    # methods_taobao = df_taobao.columns.levels[1]
-
-
-
+def visual_leave_threshold(df_kuaishou, df_taobao, save_fig_dir, savename):
     all_method = sorted(set(df_kuaishou.columns.to_list() + df_taobao.columns.to_list()))
     color = sns.color_palette(n_colors=len(all_method))
     markers = ["o", "s", "p", "P", "X", "*", "h", "D", "v", "^", ">", "<"]
@@ -66,12 +46,10 @@ def visual_env(df_kuaishou, df_taobao, save_fig_dir, savename):
     marker1 = [marker_kv[k] for k in df_kuaishou.columns]
     marker2 = [marker_kv[k] for k in df_taobao.columns]
 
-
     fig = plt.figure(figsize=(5.5, 2))
     plt.subplots_adjust(wspace=0.4)
 
     ax2 = plt.subplot(121)
-    # ax1 = plt.gca()
     ax2.set_ylabel("Accumulated reward", fontsize=11)
     ax2.set_xlabel(r"Distance threshold $d_Q$", fontsize=11)
     df_taobao.plot(kind="line", linewidth=1.8, ax=ax2, legend=None, color=color2, fillstyle='none', alpha=0.7, markeredgewidth=1.8)
@@ -107,12 +85,14 @@ def visual_env(df_kuaishou, df_taobao, save_fig_dir, savename):
     ax2.set_title("VirtualTaobao", fontsize=11, y=1)
 
     fig.savefig(os.path.join(save_fig_dir, savename + '.pdf'), format='pdf', bbox_inches='tight')
+    plt.show()
     plt.close(fig)
 
-def main():
+def visual_leave_condition():
     realpath = os.path.dirname(__file__)
     save_fig_dir = os.path.join(realpath, "figures")
 
+    print("Loading logs...")
     dir1 = os.path.join(".", "results_leave", "kuaishou")
     filenames1 = walk_paths(dir1)
     df1 = loaddata(dir1, filenames1)
@@ -121,10 +101,10 @@ def main():
     filenames2 = walk_paths(dir2)
     df2 = loaddata(dir2, filenames2)
 
-    # df_kuaishou = handle_data(df1, rl_threshold=100)
-    # df_taobao = handle_data(df2, rl_threshold=0)
 
-    ways={'FB', 'NX_0_', 'NX_10_'}
+
+    print("Transform data...")
+    ways={'FB'}
     metrics={'ctr', 'len_tra', 'R_tra',  'CV', 'CV_turn', 'ifeat_feat'}
     df_kuaishou = organize_df(df1, ways, metrics)
 
@@ -132,16 +112,16 @@ def main():
     metrics = {'ctr', 'len_tra', 'R_tra'}
     df_taobao = organize_df(df2, ways, metrics)
 
-
     df_ks = df_kuaishou['FB']
     df_tb = df_taobao['FB']
 
-    df_ks = handle_data(df_ks)
-    df_tb = handle_data(df_tb)
+    df_ks_grouped = group_data(df_ks)
+    df_tb_grouped = group_data(df_tb)
 
-    visual_env(df_ks, df_tb, save_fig_dir, savename="leave")
+    print("Producing the figure...")
+    visual_leave_threshold(df_ks_grouped, df_tb_grouped, save_fig_dir, savename="leave")
 
 
 if __name__ == '__main__':
     # args = get_args()
-    main()
+    visual_leave_condition()

@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/7/26 10:15 上午
-# @Author  : Chongming GAO
-# @FileName: train_staticRS_on_logData_evaluate_in_realEnv.py
-
 
 import argparse
 import collections
@@ -11,7 +7,6 @@ import functools
 
 import json
 import os
-import pickle
 import time
 import traceback
 
@@ -28,7 +23,6 @@ from core.util import negative_sampling, load_static_validate_data_kuaishou
 from deepctr_torch.inputs import DenseFeat
 import pandas as pd
 import numpy as np
-from tensorflow.python.keras.callbacks import Callback
 
 from core.static_dataset import StaticDataset
 
@@ -37,8 +31,7 @@ from logzero import logger
 
 from environments.KuaishouRec.env.data_handler import get_training_item_domination
 from environments.KuaishouRec.env.kuaishouEnv import KuaishouEnv
-from evaluation import test_kuaishou, test_static_model_in_RL_env
-# from util.upload import my_upload
+from evaluation import test_static_model_in_RL_env
 from util.utils import create_dir, LoggerCallback_Update
 
 DATAPATH = "environments/KuaishouRec/data"
@@ -59,7 +52,7 @@ def get_args():
     parser.add_argument("--num_trajectory", type=int, default=200)
     parser.add_argument("--force_length", type=int, default=10)
     parser.add_argument('--epsilon', default=0, type=float)
-    parser.add_argument("--top_rate", type=float, default=0.6)
+    parser.add_argument("--top_rate", type=float, default=0.8)
 
     parser.add_argument('--gamma', default=0.1, type=float)
 
@@ -110,24 +103,13 @@ def compute_popularity_kuaishouRec_pairwise(df_x, df_big, timestamp, gamma, num_
 
     print("number of interaction in stages:", dict_total)
 
-    # index_neg = np.random.choice(num_bin, len(df_x_neg), p=np.array(list(dict_total.values()))/sum(list(dict_total.values())))
-    #
-    # popularity_neg = np.array(list(map(lambda i,x: dict_counter[i][x] / dict_total[i], index_neg, df_x_neg['photo_id'])))
-    # popularity_neg = np.expand_dims(popularity_neg,-1)
-    #
-    # popularity_all = np.concatenate([popularity, popularity_neg], axis=0)
-
     popularity_gamma = popularity ** gamma
-
-    # average_popularity = popularity_gamma.mean()
 
     return popularity_gamma
 
 
 def load_dataset_kuaishou_PD(entity_dim, feature_dim):
-    # CODEPATH = os.path.dirname(__file__)
-    # ROOTPATH = os.path.dirname(CODEPATH)
-    # DATAPATH = os.path.join(ROOTPATH, "data")
+
 
     filename = os.path.join(DATAPATH, "big_matrix.csv")
     df_big = pd.read_csv(filename, usecols=['user_id', 'photo_id', 'timestamp', 'watch_ratio', 'photo_duration'])
@@ -254,34 +236,6 @@ def main(args):
                              batch_size=args.batch_size, epochs=args.epoch,
                              callbacks=[LoggerCallback_Update(logger_path)])
     logger.info(history.history)
-
-    # model_parameters = {"feature_columns": x_columns, "y_columns": y_columns, "task": task,
-    #                     "task_logit_dim": task_logit_dim, "dnn_hidden_units": args.dnn, "seed": SEED, "device": device}
-    #
-    # model_parameter_path = os.path.join(MODEL_SAVE_PATH,
-    #                                     "{}_params_{}.pickle".format(args.user_model_name, args.message))
-    # with open(model_parameter_path, "wb") as output_file:
-    #     pickle.dump(model_parameters, output_file)
-
-    # normed_mat = KuaishouEnv.compute_normed_reward(model, lbe_user, lbe_photo, df_photo_env)
-    # mat_save_path = os.path.join(MODEL_SAVE_PATH, "normed_mat-{}.pickle".format(args.message))
-    # with open(mat_save_path, "wb") as f:
-    #     pickle.dump(normed_mat, f)
-
-    #  To cpu
-    # user_model = model.cpu()
-    # user_model.linear_model.device = "cpu"
-    # for linear_model in user_model.linear_model_task:
-    #     linear_model.device = "cpu"
-    #
-    # model_save_path = os.path.join(MODEL_SAVE_PATH, "{}_{}.pt".format(args.user_model_name, args.message))
-    # torch.save(model.state_dict(), model_save_path)
-
-    REMOTE_ROOT = "/root/Counterfactual_IRS"
-    LOCAL_PATH = logger_path
-    REMOTE_PATH = os.path.join(REMOTE_ROOT, os.path.dirname(LOCAL_PATH))
-
-    # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
 
 
 

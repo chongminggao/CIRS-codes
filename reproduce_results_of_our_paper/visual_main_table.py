@@ -12,10 +12,9 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.transforms import Bbox
 
-from util.utils import create_dir
 import seaborn as sns
 
-from visualization.visual_utils import walk_paths, loaddata, organize_df
+from visual_utils import walk_paths, loaddata, organize_df, create_dir
 
 
 def axis_shift(ax1, x_shift=0.01, y_shift=0):
@@ -42,6 +41,8 @@ def draw(df_metric, ax1, color, marker, name):
     ax1.set_ylabel(name, fontsize=10, fontweight=700)
 
 def visual(df_all, save_fig_dir, savename="three"):
+    df_all.rename(columns={r"$\text{CV}_\text{M}$": r"CV_M"}, level=1,
+                  inplace=True)
     ways = df_all.columns.levels[0]
     metrics = df_all.columns.levels[1]
     methods = df_all.columns.levels[2]
@@ -69,7 +70,7 @@ def visual(df_all, save_fig_dir, savename="three"):
         marker = [marker_kv[name] for name in methods]
 
         for row, metric in enumerate(metrics):
-            print(metric, row, col)
+            # print(metric, row, col)
             df_metric = df[metric]
             ax1 = plt.subplot2grid((len(metrics), len(ways)), (row, col))
             axs[row, col] = ax1
@@ -88,33 +89,67 @@ def visual(df_all, save_fig_dir, savename="three"):
     plt.close(fig)
 
 
-def handle_table(df_all, save_fig_dir, savename="all_results"):
-    ways = df_all.columns.levels[0]
+def get_top2_methods(col, is_largest):
+    if is_largest:
+        top2_name = col.nlargest(2).index.tolist()
+    else:
+        top2_name = col.nsmallest(2).index.tolist()
+    name1, name2 = top2_name[0], top2_name[1]
+    return name1, name2
+
+def handle_one_col(df_metric, final_rate, is_largest):
+    length = len(df_metric)
+    res_start = int((1-final_rate) * length)
+    mean = df_metric[res_start:].mean()
+    std = df_metric[res_start:].std()
+
+
+
+    # mean.nlargest(2).index[1]
+    res_latex = pd.Series(map(lambda mean, std: f"${mean:.3f}\pm {std:.3f}$", mean, std),
+                          index=mean.index)
+    res_excel = pd.Series(map(lambda mean, std: f"{mean:.3f}+{std:.3f}", mean, std),
+                          index=mean.index)
+
+    name1, name2 = get_top2_methods(mean, is_largest=is_largest)
+    res_latex.loc[name1] = r"$\mathbf{" + r"{}".format(res_latex.loc[name1][1:-1]) + r"}$"
+    res_latex.loc[name2] = r"\underline{" + res_latex.loc[name2] + r"}"
+
+    return res_latex, res_excel
+
+def handle_table(df_all, save_fig_dir, savename="all_results", final_rate=1):
+    df_all.rename(columns={"FB": "Standard", "NX_0_": r"No Overlapping", "NX_10_": r"No Overlapping for 10 turns"}, level=0, inplace=True)
+    df_all.rename(columns={"ifeat_feat": "MCD", "CV_turn": r"$\text{CV}_\text{M}$", "len_tra":"Length"}, level=1, inplace=True)
+
+    ways = df_all.columns.levels[0][::-1]
     metrics = df_all.columns.levels[1]
-    methods = df_all.columns.levels[2]
+    methods = df_all.columns.levels[2].to_list()
+    methods.remove("CIRS")
+    methods.remove("CIRS w/o CI")
+    methods = methods + ["CIRS", "CIRS w/o CI"]
+    methods_order = dict(zip(methods, list(range(len(methods)))))
+
 
     df_latex = pd.DataFrame(columns=pd.MultiIndex.from_product([ways, metrics], names=["ways", "metrics"]))
     df_excel = pd.DataFrame(columns=pd.MultiIndex.from_product([ways, metrics], names=["ways", "metrics"]))
 
-    def handle(df_metric):
-        mean = df_metric.mean()
-        std = df_metric.std()
-        res_latex = pd.Series(map(lambda mean, std: f"${mean:.3f}\pm {std:.3f}$", mean, std),
-                              index=mean.index)
-        res_excel = pd.Series(map(lambda mean, std: f"{mean:.3f}+{std:.3f}", mean, std),
-                              index=mean.index)
-        return res_latex, res_excel
+
 
     for col, way in enumerate(ways):
         df = df_all[way]
         for row, metric in enumerate(metrics):
             df_metric = df[metric]
-            df_latex[way, metric], df_excel[way, metric] = handle(df_metric)
+            is_largest = False if metric == "MCD" else True
+            df_latex[way, metric], df_excel[way, metric] = handle_one_col(df_metric, final_rate, is_largest=is_largest)
 
-    print(df_latex.to_latex(escape=False))
+
+    df_latex.sort_index(key=lambda index:[methods_order[x] for x in index.to_list()], inplace=True)
+    df_excel.sort_index(key=lambda index: [methods_order[x] for x in index.to_list()], inplace=True)
+
+    # print(df_latex.to_markdown())
     excel_path = os.path.join(save_fig_dir, savename + '.xlsx')
-
     df_excel.to_excel(excel_path)
+    return df_latex, df_excel
 
 
 def visual_one_group():
@@ -128,11 +163,12 @@ def visual_one_group():
     filenames = walk_paths(dirpath)
     dfs = loaddata(dirpath, filenames)
 
-    ways = {'FB', 'NX_0_', 'NX_10_'}
-    metrics = {'ctr', 'len_tra', 'R_tra', 'CV', 'CV_turn', 'ifeat_feat'}
+    ways = {'FB', 'NX_0_'}
+    metrics = {'len_tra', 'CV', 'CV_turn', 'ifeat_feat'}
     df_all = organize_df(dfs, ways, metrics)
 
-    handle_table(df_all, save_fig_dir, savename="all_results")
+    df_latex, df_excel = handle_table(df_all, save_fig_dir, savename="all_results")
+    print(df_latex.to_latex(escape=False))
     # visual(df_all, save_fig_dir, savename="all_results")
 
 

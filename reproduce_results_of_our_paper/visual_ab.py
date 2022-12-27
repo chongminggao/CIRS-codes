@@ -6,7 +6,6 @@
 import argparse
 import collections
 import os
-import pickle
 
 from collections import OrderedDict
 
@@ -17,8 +16,6 @@ import torch
 from matplotlib import pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 import seaborn as sns
-
-from core.user_model_pairwise import UserModel_Pairwise
 
 
 DATAPATH = "../environments/KuaishouRec/data"
@@ -37,32 +34,14 @@ def get_args():
     return args
 
 
-def loaddata(model_parameter_path, model_save_path):
-    with open(model_parameter_path, "rb") as file:
-        model_params = pickle.load(file)
-
-    model_params["device"] = "cpu"
-    user_model = UserModel_Pairwise(**model_params)
-    user_model.load_state_dict(torch.load(model_save_path))
-
-    with open(model_parameter_path, "rb") as file:
-        model_params = pickle.load(file)
-
-    # if hasattr(user_model, 'ab_embedding_dict') and is_ab:
-    alpha_u = user_model.ab_embedding_dict["alpha_u"].weight.detach().cpu().numpy()
-    beta_i = user_model.ab_embedding_dict["beta_i"].weight.detach().cpu().numpy()
-    # else:
-    #     print("Note there are no available alpha and beta！！")
-    #     alpha_u = np.ones([7176, 1])
-    #     beta_i = np.ones([10729, 1])
-
-    filename = os.path.join(DATAPATH, "big_matrix.csv")
-    df_big = pd.read_csv(filename, usecols=['user_id', 'photo_id', 'timestamp', 'watch_ratio', 'photo_duration'])
-
-    return alpha_u, beta_i, df_big
+def loaddata_ab(model_save_path):
+    model_params = torch.load(model_save_path)
+    alpha_u = model_params["ab_embedding_dict.alpha_u.weight"].detach().cpu().numpy()
+    beta_i = model_params["ab_embedding_dict.beta_i.weight"].detach().cpu().numpy()
+    return alpha_u, beta_i
 
 
-def visual(alpha_u, beta_i, df_big, save_fig_dir, savename="alpha_beta"):
+def visual_ab(alpha_u, beta_i, df_big, save_fig_dir):
     user_cnt = collections.Counter(df_big['user_id'])
     item_cnt = collections.Counter(df_big['photo_id'])
 
@@ -98,7 +77,8 @@ def visual(alpha_u, beta_i, df_big, save_fig_dir, savename="alpha_beta"):
 
     g1.ax_joint.set_xlabel(r'$\alpha_u$ (Sensitivity of Users)', fontsize=22)
     g1.ax_joint.set_ylabel(r'Activity of Users', fontsize=22)
-    g1.savefig(os.path.join(save_fig_dir, savename1 + '.pdf'), format='pdf')
+    g1.savefig(os.path.join(save_fig_dir, savename1 + '.pdf'), format='pdf', bbox_inches='tight')
+    plt.show()
     plt.close()
 
     savename2 = "beta_popularity"
@@ -107,7 +87,8 @@ def visual(alpha_u, beta_i, df_big, save_fig_dir, savename="alpha_beta"):
     g2.plot_joint(sns.kdeplot, color="r", zorder=1, levels=6)
     g2.ax_joint.set_xlabel(r'$\beta_i$ (Unendurableness of Items)', fontsize=22)
     g2.ax_joint.set_ylabel(r'Popularity of Items', fontsize=22)
-    g2.savefig(os.path.join(save_fig_dir, savename2 + '.pdf'), format='pdf')
+    g2.savefig(os.path.join(save_fig_dir, savename2 + '.pdf'), format='pdf', bbox_inches='tight')
+    plt.show()
     plt.close()
 
 
@@ -116,13 +97,15 @@ def visual_alpha_beta(visual_path, user_model_name, read_message):
     realpath = os.path.dirname(__file__)
     save_fig_dir = os.path.join(realpath, "figures")
 
-    model_parameter_path = os.path.join(visual_path,
-                                        "{}_params_{}.pickle".format(user_model_name, read_message))
+    # model_parameter_path = os.path.join(visual_path, "{}_params_{}.pickle".format(user_model_name, read_message))
     model_save_path = os.path.join(visual_path, "{}_{}.pt".format(user_model_name, read_message))
 
-    alpha_u, beta_i, df_big = loaddata(model_parameter_path, model_save_path)
+    alpha_u, beta_i = loaddata_ab(model_save_path)
 
-    visual(alpha_u, beta_i, df_big, save_fig_dir)
+    bigmatrix_filename = os.path.join(DATAPATH, "big_matrix.csv")
+    df_big = pd.read_csv(bigmatrix_filename, usecols=['user_id', 'photo_id'])
+
+    visual_ab(alpha_u, beta_i, df_big, save_fig_dir)
 
 
 if __name__ == '__main__':

@@ -10,10 +10,7 @@ from tqdm import tqdm
 def get_feat_dominate_dict(df_item_val, all_acts_origin, item_feat_domination, top_rate=0.6):
     if item_feat_domination is None:  # for yahoo
         return dict()
-    # if need_transform:
-    #     all_acts_origin = lbe_photo.inverse_transform(all_acts)
-    # else:
-    #     all_acts_origin = all_acts
+
 
     feat_dominate_dict = {}
     recommended_item_features = df_item_val.loc[all_acts_origin]
@@ -222,14 +219,6 @@ def test_kuaishou(model, env, dataset_val, is_softmax=True, epsilon=0, is_ucb=Fa
     CV = hit_item / num_items
     CV_turn = hit_item / len(all_acts)
 
-    # print('CTR: %.2f'.format(ctr))
-    # eval_result_RL = {"ctr": ctr,
-    #                   "click_loss": click_loss,
-    #                   "trajectory_len": total_turns / num_trajectory,
-    #                   "R_tra": cumulative_reward / num_trajectory,
-    #                   "CV":CV,
-    #                   "CV_turn":CV_turn
-    #                   }
 
     eval_result_RL = {
         "click_loss": click_loss,

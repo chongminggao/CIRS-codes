@@ -8,7 +8,7 @@
 
 pip install torch
 
-pip3 install --upgrade --no-cache-dir scipy sklearn tqdm logzero gym seaborn openpyxl paramiko
+pip3 install --upgrade --no-cache-dir scipy sklearn tqdm logzero gym seaborn openpyxl paramiko jupyterlab
 
 cd tianshou
 pip3 install -e .

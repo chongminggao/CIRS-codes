@@ -2,20 +2,20 @@
 
 There are three steps to reproduce the results.
 1. Run the scripts to run the experiments to produce the log files.
-2. Collect the results by copying the log files and paste them to certain directories.
+2. Collect the results by copying the log files and pasting them to certain directories.
 3. Visualize the results and reproduce the main figures and tables in the paper.
 
-We have finished the first two steps and prepared all logs as required. You can visualize the results by only running the Jupyter Notebook in the third steps on the prepared log files. 
+We have finished the first two steps and prepared all logs as required. You can visualize the results by only running the third step. 
 
 ### Step 1. Re-run the experiments.
 
-All parameters are all set for reproduce the results. We fix the random seed so that the results will not change each time on the same machine. However, the results can still vary with running on different machines.
+All parameters are all set for reproducing the results. We fix the random seed so that the results will not change each time on the same machine. However, the results can still vary when running on different machines.
 
-Different methods are running in a parallel way by adding `&` at the end of each shell commands. Please revise the parameter `--cuda` for each line and distribute them according to the GPU memories of your server. A server with 8 GPUs are recommended. 
+Different methods are running in a parallel way by adding `&` at the end of each shell command. Please revise the parameter `--cuda` for each line and distribute them according to the GPU memories of your server. A server with 8 GPUs is recommended. 
 
 Make sure you have installed the required environment and downloaded the datasets (see [here](https://github.com/chongminggao/CIRS-codes#installation)).
 
-The following scripts are used for reproduce the Figure 5 in the paper.
+The following scripts are used for reproducing Figure 5 in the paper.
 
 1. ##### Train the user model on two datasets. 
 
@@ -35,7 +35,7 @@ python CIRS-UserModel-taobao.py    --cuda 3 --epoch 10 --max_turn 50 --tau 0 --l
 python CIRS-UserModel-taobao.py    --cuda 4 --epoch 10 --tau 1 --leave_threshold 1 --num_leave_compute 5 --message "taobao tau 1" & 
 ```
 
-The logs and saved models are saved in `/saved_models`. Please wait until all progresses terminate before learning the RL policies.
+The logs and saved models are saved in `/saved_models`. Please wait until all processes terminate before learning the RL policies.
 
 2. ##### Learn the RL policies. 
 
@@ -67,7 +67,7 @@ python CIRS-RL-taobao.py --cuda 0  --max_turn 10 --epoch 200 --tau 0.1 --leave_t
 python CIRS-RL-taobao.py --cuda 0  --max_turn 10 --epoch 200 --tau 0 --leave_threshold 1 --num_leave_compute 5 --read_message "taobao tau 0" --message "T_CIRSwoCI_len10" &
 ```
 
-**Note:** Learning on VirtualTaobao are very slow and the GPU utilization is very low (near 0). The bottleneck is the VirtualTaobao environment, which computes the rewards on the fly. By contrast, experiments running on KuaiEnv are very efficient. Therefore, we do not recommend you to run on VirtualTaobao.
+**Note:** Learning on VirtualTaobao is slow and the GPU utilization is very low (near 0). The bottleneck is the VirtualTaobao environment, which computes the rewards on the fly. By contrast, experiments running on KuaiEnv are very efficient.
 
 Wait until all processes terminate. You can inspect the performance in the logs under `/saved_models`.
 
@@ -77,29 +77,24 @@ Wait until all processes terminate. You can inspect the performance in the logs 
 
 All log files for visualizing Figure 5 and Table 2 should be saved as shown in the following structure.
 
-We have prepared all files for you, so you can directly conduct step 3 without conducting step 1 and 2. If you want to run it youself, you should copy your logs from `/saved_models` and replace the logs of the corresponding methods.
+We have prepared all files for you, so you can directly conduct step 3 without conducting steps 1 and 2. If you want to run it yourself, you should copy your logs from `/saved_models` and replace the logs of the corresponding methods.
 
 ```
 CIRS-codes
-├── reproduce_results_of_our_paper
-│   ├── README.md
-│   ├── Reproduce_results.ipynb
-│   ├── figures
-│   │   └── main_result.pdf
 │   ├── results_all_methods
 │   │   ├── kuaishou_len100
-│   │   │   ├── [DICE]_2022_12_23-02_15_00.log
-│   │   │   ├── [DeepFM+Softmax]_2022_12_23-02_15_00.log
-│   │   │   ├── [IPS]_2022_12_23-02_15_00.log
-│   │   │   ├── [K_CIRS_len100]_2022_12_21-17_14_00.log
-│   │   │   ├── [K_CIRSwoCI_len100]_2022_12_21-17_18_44.log
-│   │   │   ├── [K_Random]_2022_12_23-02_15_00.log
-│   │   │   ├── [K_epsilon-greedy]_2022_12_23-02_15_00.log
-│   │   │   ├── [PD]_2022_12_23-02_15_00.log
-│   │   │   └── [UCB]_2022_12_23-02_15_00.log
+│   │   │   ├── [DICE]_2022_12_24-16_43_59.log
+│   │   │   ├── [DeepFM+Softmax]_2022_12_24-16_43_59.log
+│   │   │   ├── [IPS]_2022_12_25-13_34_03.log
+│   │   │   ├── [K_CIRS_len100_r08]_2022_12_24-16_43_58.log
+│   │   │   ├── [K_CIRSwoCI_len100_r08]_2022_12_24-08_35_42.log
+│   │   │   ├── [K_Random]_2022_12_24-16_43_59.log
+│   │   │   ├── [K_epsilon-greedy]_2022_12_24-16_43_59.log
+│   │   │   ├── [PD]_2022_12_24-16_43_59.log
+│   │   │   └── [UCB]_2022_12_24-16_43_59.log
 │   │   ├── kuaishou_len30
-│   │   │   ├── [K_CIRS_len30]_2022_12_21-17_18_44.log
-│   │   │   └── [K_CIRSwoCI_len30]_2022_12_21-17_18_44.log
+│   │   │   ├── [K_CIRS_len30_r08]_2022_12_24-08_35_42.log
+│   │   │   └── [K_CIRSwoCI_len30_r08]_2022_12_24-16_43_58.log
 │   │   ├── taobao_len10
 │   │   │   ├── [T_CIRS_len10]_2022_12_18-00_07_19.log
 │   │   │   └── [T_CIRSwoCI_len10]_2022_12_18-00_07_19.log
@@ -121,19 +116,11 @@ CIRS-codes
 
 We have already prepared those logs in this repository. So you can directly visualize the results.
 
-We illustrate the results via the Jupyter Notebook file: visualize_results.ipynb.
+We illustrate the results via the Jupyter Notebook file: `visualize_main_results.ipynb`.
 
 The output is illustrated in [this HTML](#).
 
 Or you can try it yourself at Google Colab.
 
 
-
----
-
-Similality, You can reproduce the Figure 6 by:
-
-1. Running all experiments in scripts:
-2. Collected all results (again, this is done by us).
-3. Visualize the figure by running "visualize_leave_conditions.ipynb", which is illustrate in this HTML or this Google Colab page.
 

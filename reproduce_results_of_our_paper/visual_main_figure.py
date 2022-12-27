@@ -13,11 +13,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.transforms import Bbox
-
-from util.utils import create_dir
 import seaborn as sns
 
-from visualization.visual_utils import walk_paths, organize_df, loaddata
+from visual_utils import walk_paths, organize_df, loaddata, create_dir
 
 
 def axis_shift(ax1, x_shift=0.01, y_shift=0):
@@ -37,30 +35,10 @@ def compute_improvement(df, col, last=0):
 def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
     visual_cols = ['R_tra', 'len_tra', 'ctr']
 
-    df1 = df1.iloc[:100]
-    df2 = df2.iloc[:200]
-    df3 = df3.iloc[:200]
-    df4 = df4.iloc[:1000]
-
-    # compute_improvement(df1, col="R_tra", last=0)
-    # compute_improvement(df2, col="R_tra", last=0)
-    # compute_improvement(df3, col="R_tra", last=0)
-    # compute_improvement(df4, col="R_tra", last=0)
-    #
-    # compute_improvement(df1, col="R_tra", last=10)
-    # compute_improvement(df2, col="R_tra", last=10)
-    # compute_improvement(df3, col="R_tra", last=10)
-    # compute_improvement(df4, col="R_tra", last=10)
-    #
-    # compute_improvement(df1, col="ctr", last=10)
-    # compute_improvement(df2, col="ctr", last=10)
-    # compute_improvement(df3, col="ctr", last=10)
-    # compute_improvement(df4, col="ctr", last=10)
-    #
-    # compute_improvement(df1, col="len_tra", last=10)
-    # compute_improvement(df2, col="len_tra", last=10)
-    # compute_improvement(df3, col="len_tra", last=10)
-    # compute_improvement(df4, col="len_tra", last=10)
+    # df1 = df1.iloc[:100]
+    # df2 = df2.iloc[:200]
+    # df3 = df3.iloc[:200]
+    # df4 = df4.iloc[:1000]
 
     dfs = [df1, df2, df3, df4]
     series = "ABCD"
@@ -75,6 +53,10 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
 
 
     methods_list = list(all_method)
+    methods_list.remove("CIRS")
+    methods_list.remove("CIRS w/o CI")
+    methods_list = ["CIRS", "CIRS w/o CI"] + methods_list
+
 
     num_methods = len(methods_list)
 
@@ -159,13 +141,7 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
     lines2, labels2 = ax4.get_legend_handles_labels()
     dict_label = dict(zip(labels1, lines1))
     dict_label.update(dict(zip(labels2, lines2)))
-    dict_label = OrderedDict(sorted(dict_label.items(), key=lambda x: x[0]))
-
-    dict_label = {'CIRS w/o CI' if k == 'CIRS w_o CI' or k == 'CIRSwoCI' else k: v for k, v in dict_label.items()}
-    dict_label = {r'$\epsilon$-greedy' if k == 'Epsilon Greedy' or k == 'epsilon-greedy' else k: v for k, v in
-                  dict_label.items()}
-    dict_label = {r'DeepFM' if k == 'DeepFM+Softmax' else k: v for k, v in dict_label.items()}
-
+    # dict_label = OrderedDict(sorted(dict_label.items(), key=lambda x: x[0]))
     ax1.legend(handles=dict_label.values(), labels=dict_label.keys(), ncol=10,
                loc='lower left', columnspacing=0.7,
                bbox_to_anchor=(-0.20, 1.24), fontsize=10.5)
@@ -176,9 +152,11 @@ def visual4(df1, df2, df3, df4, save_fig_dir, savename="three"):
     axo.add_line(line)
     plt.text(0.16, 0.02, "(A-B) Results with large interaction rounds", fontsize=11, fontweight=400)
     plt.text(0.58, 0.02, "(C-D) Results with limited interaction rounds", fontsize=11, fontweight=400)
-    # plt.axis('off')
+    plt.axis('off')
 
     fig.savefig(os.path.join(save_fig_dir, savename + '.pdf'), format='pdf', bbox_inches='tight')
+    # fig.savefig(os.path.join(save_fig_dir, savename + '.png'), format='png', bbox_inches='tight')
+    plt.show()
     plt.close(fig)
 
 

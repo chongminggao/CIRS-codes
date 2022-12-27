@@ -1,36 +1,27 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2021/7/26 10:15 上午
-# @Author  : Chongming GAO
-# @FileName: train_staticRS_on_logData_evaluate_in_realEnv.py
-
 
 import argparse
 import collections
 import datetime
-import functools
 import json
 import os
 import pickle
 import time
 import traceback
 
-import gym
 import torch
 import tqdm
 
-from gym.envs.registration import register
 from core.util import compute_action_distance, compute_exposure
 from deepctr_torch.inputs import DenseFeat
 import pandas as pd
 import numpy as np
-from tensorflow.python.keras.callbacks import Callback
 
 from core.static_dataset import StaticDataset
 from core.user_model_mmoe import UserModel_MMOE
 import logzero
 from logzero import logger
 
-from evaluation import test_taobao
 from util.utils import create_dir, LoggerCallback_Update
 
 
@@ -51,7 +42,6 @@ def get_args():
     parser.add_argument('--tau', default=0.01, type=float)
 
     parser.add_argument("--message", type=str, default="UserModel1")
-
 
     # parser.add_argument('--dim', default=20, type=int)
 
@@ -173,7 +163,8 @@ def main(args):
     model_parameters = {"feature_columns": x_columns, "y_columns": y_columns, "num_tasks": len(tasks), "tasks": tasks,
                         "task_logit_dim": task_logit_dim, "dnn_hidden_units": args.dnn, "seed": SEED, "device": device}
 
-    model_parameter_path = os.path.join(MODEL_SAVE_PATH, "{}_params_{}.pickle".format(args.user_model_name, args.message))
+    model_parameter_path = os.path.join(MODEL_SAVE_PATH,
+                                        "{}_params_{}.pickle".format(args.user_model_name, args.message))
     with open(model_parameter_path, "wb") as output_file:
         pickle.dump(model_parameters, output_file)
 
@@ -193,13 +184,10 @@ def main(args):
     # my_upload(LOCAL_PATH, REMOTE_PATH, REMOTE_ROOT)
 
 
-
-
 def loss_taobao(y_predict, y_true, exposure, y_index):
+    y_exposure = 1 / (1 + exposure) * y_predict
 
-    y_exposure = 1/(1+exposure) * y_predict
-
-    loss = (((y_exposure - y_true)**2) * (y_true + 1)).mean()
+    loss = (((y_exposure - y_true) ** 2) * (y_true + 1)).mean()
 
     return loss
 
