@@ -98,7 +98,7 @@ Note that the implementation requires two platforms, [DeepCTR-Torch](https://git
 
 - Optional link 2: [USTC drive](https://rec.ustc.edu.cn/share/0fcb0130-5bce-11ec-be8a-9b5319b7bbe2)
 
-2. Uncompress the downloaded `environment data.zip` and put the files to their corresponding positions.
+2. Uncompress the downloaded `environment data.zip` and put the files in their corresponding positions.
 
    ```bash
    unzip "environment data.zip"
