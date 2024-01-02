@@ -109,9 +109,9 @@ Note that the implementation requires two platforms, [DeepCTR-Torch](https://git
 
 - Optional link 1: [Google drive](https://drive.google.com/file/d/1v9y-nxhrtOg_Kd3sm6hJ4curNFpgRbPx/view).
 
-- Optional link 1: [Zenodo](https://zenodo.org/records/10448452).
+- Optional link 2: [Zenodo](https://zenodo.org/records/10448452).
 
-- Optional link 2: [USTC drive (for Chinese researchers)](https://rec.ustc.edu.cn/share/0fcb0130-5bce-11ec-be8a-9b5319b7bbe2)
+- Optional link 3: [USTC drive (for Chinese researchers)](https://rec.ustc.edu.cn/share/0fcb0130-5bce-11ec-be8a-9b5319b7bbe2)
 
 2. Uncompress the downloaded `environment data.zip` and put the files in their corresponding positions.
 
