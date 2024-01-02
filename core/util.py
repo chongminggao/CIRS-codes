@@ -92,7 +92,7 @@ def load_static_validate_data_kuaishou(entity_dim, feature_dim, DATAPATH):
         # list_feat[i] = set(data_feat[str(i)]['feature_index'])
         list_feat[i] = data_feat[str(i)]['feature_index']
 
-    df_feat = pd.DataFrame(list_feat, columns=['feat0', 'feat1', 'feat2', 'feat3'], dtype=int)
+    df_feat = pd.DataFrame(list_feat, columns=['feat0', 'feat1', 'feat2', 'feat3'])
     df_feat.index.name = "photo_id"
     df_feat[df_feat.isna()] = -1
     df_feat = df_feat + 1
@@ -279,10 +279,10 @@ def negative_sampling(df_big, df_feat, DATAPATH):
     df_small = pd.read_csv(small_path, header=0, usecols=['user_id', 'photo_id'])
 
     mat_small = csr_matrix((np.ones(len(df_small)), (df_small['user_id'], df_small['photo_id'])),
-                           shape=(df_big['user_id'].max() + 1, df_big['photo_id'].max() + 1), dtype=np.bool).toarray()
+                           shape=(df_big['user_id'].max() + 1, df_big['photo_id'].max() + 1)).toarray().astype(bool)
     # df_negative = df_big.copy()
     mat_big = csr_matrix((np.ones(len(df_big)), (df_big['user_id'], df_big['photo_id'])),
-                         shape=(df_big['user_id'].max() + 1, df_big['photo_id'].max() + 1), dtype=np.bool).toarray()
+                         shape=(df_big['user_id'].max() + 1, df_big['photo_id'].max() + 1)).toarray().astype(bool)
 
     # mat_negative = lil_matrix((df_big['user_id'].max() + 1, df_big['photo_id'].max() + 1), dtype=np.bool).toarray()
     # find_negative(df_big['user_id'].to_numpy(), df_big['photo_id'].to_numpy(), mat_small, mat_big, mat_negative,

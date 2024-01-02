@@ -13,18 +13,31 @@ More descriptions are available via the [paper](https://arxiv.org/pdf/2204.01266
 If this work helps you, please kindly cite our papers:
 
 ```latex
-@article{gao2022cirs,
+@article{gao2023CIRS,
+  author = {Gao, Chongming and Wang, Shiqi and Li, Shijun and Chen, Jiawei and He, Xiangnan and Lei, Wenqiang and Li, Biao and Zhang, Yuan and Jiang, Peng},
   title = {CIRS: Bursting Filter Bubbles by Counterfactual Interactive Recommender System},
-  author = {Gao, Chongming and Lei, Wenqiang and Chen, Jiawei and Wang, Shiqi and He, Xiangnan and Li, Shijun and Li, Biao and Zhang, Yuan and Jiang, Peng},
-  journal={arXiv preprint arXiv:2204.01266},
-  year={2022}
+  journal = {ACM Transactions on Information Systems (TOIS)},
+  year = {2023},
+  volume = {42},
+  number = {1},
+  issn = {1046-8188},
+  url = {https://doi.org/10.1145/3594871},
+  doi = {10.1145/3594871},
+  month = {aug},
+  articleno = {14},
+  numpages = {27},
 }
-
-@article{gao2022kuairec,
-  title={KuaiRec: A Fully-observed Dataset for Recommender Systems},
-  author={Gao, Chongming and Li, Shijun and Lei, Wenqiang and Li, Biao and Jiang, Peng and Chen, Jiawei and He, Xiangnan and Mao, Jiaxin and Chua, Tat-Seng},
-  journal={arXiv preprint arXiv:2202.10842},
-  year={2022}
+@inproceedings{gao2022kuairec,
+  author = {Gao, Chongming and Li, Shijun and Lei, Wenqiang and Chen, Jiawei and Li, Biao and Jiang, Peng and He, Xiangnan and Mao, Jiaxin and Chua, Tat-Seng},
+  title = {KuaiRec: A Fully-Observed Dataset and Insights for Evaluating Recommender Systems},
+  booktitle = {Proceedings of the 31st ACM International Conference on Information \& Knowledge Management},
+  series = {CIKM '22},
+  location = {Atlanta, GA, USA},
+  url = {https://doi.org/10.1145/3511808.3557220},
+  doi = {10.1145/3511808.3557220},
+  numpages = {11},
+  year = {2022},
+  pages = {540–550}
 }
 ```
 
@@ -55,7 +68,7 @@ It contains two matrices: *big matrix* and *small matrix*, where the latter is a
 ---
 ## Installation
 
-1. Clone this git repository and change directory to this repository:
+1. Clone this git repository and change the directory to this repository:
 
 	```bash
 	git clone git@github.com:chongminggao/CIRS-codes.git
@@ -89,14 +102,16 @@ Note that the implementation requires two platforms, [DeepCTR-Torch](https://git
 1. Download the compressed dataset
 
     ```bash 
-    wget https://linux.chongminggao.top/CIRS/environment%20data.zip
+    wget https://zenodo.org/records/10448452/files/"environment data.zip" # (md5:bb165aac072e00e5408ac5c159f38c1f)
     ```
 
 (Download options: If the download via `wget` is too slow, you can manually download the file to the root path of this repository)
 
-- Optional link 1: [Google drive](https://drive.google.com/file/d/1v9y-nxhrtOg_Kd3sm6hJ4curNFpgRbPx/view). 
+- Optional link 1: [Google drive](https://drive.google.com/file/d/1v9y-nxhrtOg_Kd3sm6hJ4curNFpgRbPx/view).
 
-- Optional link 2: [USTC drive](https://rec.ustc.edu.cn/share/0fcb0130-5bce-11ec-be8a-9b5319b7bbe2)
+- Optional link 1: [Zenodo](https://zenodo.org/records/10448452).
+
+- Optional link 2: [USTC drive (for Chinese researchers)](https://rec.ustc.edu.cn/share/0fcb0130-5bce-11ec-be8a-9b5319b7bbe2)
 
 2. Uncompress the downloaded `environment data.zip` and put the files in their corresponding positions.
 

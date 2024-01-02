@@ -101,7 +101,7 @@ def load_dataset_kuaishou_DICE(entity_dim, feature_dim, MODEL_SAVE_PATH):
         # list_feat[i] = set(data_feat[str(i)]['feature_index'])
         list_feat[i] = data_feat[str(i)]['feature_index']
 
-    df_feat = pd.DataFrame(list_feat, columns=['feat0', 'feat1', 'feat2', 'feat3'], dtype=int)
+    df_feat = pd.DataFrame(list_feat, columns=['feat0', 'feat1', 'feat2', 'feat3'])
     df_feat.index.name = "photo_id"
     df_feat[df_feat.isna()] = -1
     df_feat = df_feat + 1
